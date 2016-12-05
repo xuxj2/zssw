@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.map.lmxx">
+	<cache />
+
+	<insert id="insertLmxx" parameterType="java.util.Map">
+  	<![CDATA[
+  		INSERT INTO LM_XWDT( 
+  					XXID,
+  					SSLM_DM,  					
+  					YSURL,
+  					BT,
+  					FBRQ,
+  					ZW,
+  					FJURL,
+  					LJURL,
+  					XXLY) 
+  		VALUES(
+  					#{id,jdbcType=VARCHAR},
+  					#{sslm,jdbcType=VARCHAR},
+  					#{sourceUrl,jdbcType=VARCHAR},
+  					#{title,jdbcType=VARCHAR},
+  					TO_DATE(#{fbrq,jdbcType=DATE},'yyyy-mm-dd'),
+  					#{content,jdbcType=VARCHAR},
+  					#{fjUrl,jdbcType=VARCHAR},
+  					#{ljUrl,jdbcType=VARCHAR},
+  					#{xxly,jdbcType=VARCHAR}
+  		)  	
+  	]]>
+	</insert>
+
+	<select id="selectNewsForCheck" parameterType="java.util.Map"
+		resultType="int">
+  	<![CDATA[
+  		select count(*) from LM_XWDT where XXID=#{id,jdbcType=VARCHAR}
+  	]]>
+	</select>
+
+	<insert id="insertZcfg" parameterType="java.util.Map">
+  	<![CDATA[
+  		INSERT INTO LM_ZCFG( 
+  					ID,
+  					SSLM_DM,  					
+  					YSURL,
+  					BT,
+  					FBRQ,
+  					ZW,
+  					FJURL,
+  					LJURL,
+  					XXLY,
+  					FWZH,
+  					YXX) 
+  		VALUES(
+  					#{id,jdbcType=VARCHAR},
+  					#{sslm,jdbcType=VARCHAR},
+  					#{sourceUrl,jdbcType=VARCHAR},
+  					#{title,jdbcType=VARCHAR},
+  					TO_DATE(#{fbrq,jdbcType=DATE},'yyyy-mm-dd'),
+  					#{content,jdbcType=VARCHAR},
+  					#{fjUrl,jdbcType=VARCHAR},
+  					#{ljUrl,jdbcType=VARCHAR},
+  					#{xxly,jdbcType=VARCHAR},
+  					#{fwzh,jdbcType=VARCHAR},
+  					#{yxx,jdbcType=VARCHAR}
+  		)  	
+  	]]>
+	</insert>
+
+	<select id="selectZcfgForCheck" parameterType="java.util.Map"
+		resultType="int">
+  	<![CDATA[
+  		select count(*) from LM_ZCFG where ID=#{id,jdbcType=VARCHAR}
+  	]]>
+	</select>
+
+	<insert id="insertTsxx" parameterType="java.util.Map">
+  	<![CDATA[
+  		INSERT INTO LM_TSXX( 
+  					XXID,
+  					SSLM_DM,  					
+  					YSURL,
+  					BT,
+  					FBRQ,
+  					ZW,
+  					FJURL,
+  					LJURL) 
+  		VALUES(
+  					#{id,jdbcType=VARCHAR},
+  					#{sslm,jdbcType=VARCHAR},
+  					#{sourceUrl,jdbcType=VARCHAR},
+  					#{title,jdbcType=VARCHAR},
+  					TO_DATE(#{fbrq,jdbcType=DATE},'yyyy-mm-dd'),
+  					#{content,jdbcType=VARCHAR},
+  					#{fjUrl,jdbcType=VARCHAR},
+  					#{ljUrl,jdbcType=VARCHAR}
+  		)
+  	]]>
+	</insert>
+
+	<select id="selectTsxxForCheck" parameterType="java.util.Map"
+		resultType="int">
+  	<![CDATA[
+  		select count(*) from LM_TSXX where XXID=#{id,jdbcType=VARCHAR}
+  	]]>
+	</select>
+
+<delete id="deleteTsxx" parameterType="java.lang.String">
+  	<![CDATA[
+  		DELETE FROM LM_TSXX WHERE SSLM_DM=#{lmid,jdbcType=VARCHAR}
+  	]]>
+	</delete>
+
+
+</mapper>

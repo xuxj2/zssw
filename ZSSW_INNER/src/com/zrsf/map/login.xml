@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.map.login">
+	<cache />
+
+	<resultMap type="Swry" id="swry">
+		<id  property="swryDm" column="SWRY_DM" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="swryGh" column="SWRY_GH" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="deviceid" column="DEVICEID" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="xm" column="MC" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="yddh" column="YDDH" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="xb" column="XB" javaType="string" jdbcType="CHAR"/>
+   	    <result property="zw" column="ZW_MC"  javaType="string" jdbcType="VARCHAR"/>   
+   	    <result property="bgdh" column="BGDH"  javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="rzjgDm" column="RZJG_DM" javaType="string" jdbcType="VARCHAR"/>
+   	     <result property="rzjgMc" column="RZJG_MC" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="jhbj" column="SFJH"  javaType="string" jdbcType="CHAR"/>   
+   	    <result property="txUri" column="TXTP"  javaType="string" jdbcType="VARCHAR"/> 
+   	    <result property="znfw" column="ZNFW"  javaType="string" jdbcType="VARCHAR"/> 
+   	    <result property="zndm" column="ZNDM"  javaType="string" jdbcType="VARCHAR"/>  
+   	    <result property="limit" column="HTQX"  javaType="int" jdbcType="INTEGER"/>	
+   	    <result property="yzsj" column="YZSJ"  javaType="string" jdbcType="VARCHAR"/>	           
+	</resultMap>
+	
+	
+	
+	
+	
+<!-- 查询某个联系人的详细信息
+	<select id="selectLoginSwry" resultMap="swry"
+		parameterType="java.util.Map">
+  	<![CDATA[
+  		SELECT SWRY_DM,
+				MC,
+				XB,
+				ZW_MC,				
+				SWRY_GH,
+				YDDH,
+				BGDH,
+				RZJG_DM,
+				TXTP,
+				DEVICEID,
+				SFJH
+  		FROM SWRY 
+  		WHERE  USERPASSWORD=#{password,jdbcType=VARCHAR}
+  		AND YDDH=#{yddh,jdbcType=VARCHAR}
+  		AND DEVICEID=#{deviceid,jdbcType=VARCHAR}
+  		AND SWRY_GH=#{swrygh}
+  	]]>
+	</select>-->
+	
+	
+	<select id="selectLoginSwry" resultMap="swry"
+		parameterType="java.util.Map" useCache="false">
+  	<![CDATA[
+  		SELECT SWRY.SWRY_DM,
+				SWRY.MC,
+				SWRY.XB,
+				DM.MC AS ZW_MC,						
+				SWRY.SWRY_GH,
+				SWRY.YDDH,
+				SWRY.BGDH,
+				SWRY.RZJG_DM,
+				SWJG.MC_J  AS RZJG_MC,
+				'http://61.177.61.251:8222/shuixin/tx/'||NVL(SWRY.TXTP,'xttx.png') TXTP,
+				SWRY.DEVICEID,
+				SWRY.SFJH,
+        		SWJG.ZNFW, 
+        		SWJG.ZN_DM AS ZNDM,
+        		SWRY.HTQX,
+        		SWRY.YZSJ
+		FROM SWRY LEFT JOIN SWJG ON SWRY.RZJG_DM=SWJG.SWJG_DM  LEFT JOIN SWRY_ZW_DM DM	 ON DM.ZW_DM=SWRY.ZW_MC	
+  		WHERE  USERPASSWORD=#{password,jdbcType=VARCHAR}  
+  		]]>	
+  		<if test="deviceid!=null">
+  			<![CDATA[	
+  			AND DEVICEID=#{deviceid,jdbcType=VARCHAR}
+  			]]>
+  		</if>
+  		<if test="swryGh!=null">
+  			<![CDATA[	
+  			AND SWRY_GH=#{swryGh,jdbcType=VARCHAR}
+  			]]>
+  		</if>  	
+	</select>
+		
+	<update id="updateAvantar" parameterType="java.util.Map" flushCache="true" >
+		UPDATE SWRY SET TXTP=#{fileName} WHERE SWRY_DM=#{swryDm}
+	</update>	
+	
+	<update id="updateIndInfo" parameterType="Swry" flushCache="true">
+		UPDATE SWRY 
+		<set>
+			<if test="xb!=null">
+				XB=#{xb},
+			</if>		
+			<if test="yddh!=null">
+				YDDH=#{yddh},
+			</if>		
+			<if test="txUri!=null">
+				TXTP=#{txUri}
+			</if>
+			<if test="bgdh!=null">
+				BGDH=#{bgdh}
+			</if>
+		</set>
+		WHERE SWRY_DM=#{swryDm}
+	</update>
+	
+	
+</mapper>

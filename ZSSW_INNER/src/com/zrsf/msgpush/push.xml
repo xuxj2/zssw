@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.push">
+	<cache />
+	<resultMap type="ToMessage" id="toMessage">
+		<id property="id" column="ID" javaType="long" jdbcType="INTEGER" />
+		<result property="deviceId" column="DEVICEID" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="message" column="CONTENT" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="recieveTime" column="JSSJ" javaType="java.util.Date" jdbcType="TIMESTAMP" />	
+		<result property="type" column="TYPE" javaType="int" jdbcType="INTEGER" />				
+	</resultMap>
+
+	<resultMap type="Swry" id="swry">
+		<id property="swryDm" column="swryDm" javaType="string" jdbcType="VARCHAR" />
+		<result property="swryGh" column="swryGh" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="deviceid" column="deviceid" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="xm" column="xm" javaType="string" jdbcType="VARCHAR" />
+		<result property="yddh" column="yddh" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="xb" column="xb" javaType="string" jdbcType="CHAR" />
+		<result property="zw" column="zw" javaType="string" jdbcType="VARCHAR" />
+		<result property="bgdh" column="bgdh" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="rzjgDm" column="rzjgDm" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="jhbj" column="jhbj" javaType="string"
+			jdbcType="CHAR" />
+		<result property="txUri" column="txUri" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="rzjgMc" column="rzjgMc" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="znfw" column="znfw"  javaType="string" jdbcType="VARCHAR"/> 
+   	    <result property="zndm" column="zndm"  javaType="string" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	
+	<select id="selectSwryByDeviceId" resultMap="swry"
+		parameterType="java.lang.String">
+  	<![CDATA[
+  	 SELECT RY.SWRY_DM  AS "swryDm",
+  		 		RY.SWRY_GH  AS "swryGh",
+  				RY.MC 		AS "xm",
+  				RY.YDDH		AS "yddh",
+  				RY.XB		AS "xb",
+  				RY.ZW_MC	AS "zw",
+  				RY.BGDH		AS "bgdh",
+  				RY.RZJG_DM    	AS "rzjgDm",
+  				JG.MC_J    	AS "rzjgMc",
+  				'http://61.177.61.251:8222/shuixin/tx/'||NVL(RY.TXTP,'xttx.png') AS "txUri",
+  				RY.DEVICEID AS "deviceid",
+  				RY.SFJH AS "jhbj"
+		FROM SWRY RY
+		LEFT JOIN SWJG JG
+		ON RY.RZJG_DM=JG.SWJG_DM		 		 
+		WHERE RY.DEVICEID=#{deviceid,jdbcType=VARCHAR}
+  	]]>
+	</select>
+	
+	<select id="selectNoSends" resultMap="toMessage" parameterType="string" useCache="false">
+		SELECT ID,DEVICEID,CONTENT,JSSJ FROM TS_XX WHERE DEVICEID=#{deviceId,jdbcType=VARCHAR}	
+	</select>
+	
+	<insert id="insertMessage" parameterType="ToMessage">
+		INSERT INTO TS_XX(DEVICEID,CONTENT,TYPE) VALUES(#{deviceId,jdbcType=VARCHAR}, #{message,jdbcType=VARCHAR},#{type,jdbcType=INTEGER})	
+	</insert>
+	
+	
+	<delete id="deleteMessage" parameterType="long">
+		DELETE FROM TS_XX WHERE ID=#{id,jdbcType=INTEGER}
+	</delete>
+	
+	<delete id="deleteOld" parameterType="ToMessage">
+		<![CDATA[
+		DELETE FROM TS_XX WHERE DEVICEID=#{deviceId,jdbcType=VARCHAR} AND TYPE=#{type,jdbcType=INTEGER} AND JSSJ<=(SYSDATE-2)
+		]]>
+	</delete>
+
+	<select id="selectDbrws" resultMap="toMessage">
+		SELECT ID,DEVICEID,CONTENT,JSSJ FROM TS_XX WHERE TYPE=2	
+	</select>
+
+
+
+</mapper>
+
+

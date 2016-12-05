@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.manage.news">
+	<cache />
+
+	<resultMap type="News" id="news">
+		<id property="id" column="ID" javaType="string" jdbcType="VARCHAR" />
+		<result property="columnId" column="SSLM_DM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="sourceurl" column="YSURL" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="title" column="BT" javaType="string" jdbcType="VARCHAR" />
+		<result property="time" column="FBRQ" javaType="string" jdbcType="VARCHAR" />
+		<result property="textContent" column="ZW" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="fileurl" column="FJURL" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="imageurl" column="LJURL" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="channel" column="XXLY" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="issueNumber" column="FWZH" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="effective" column="YXX" javaType="string"
+			jdbcType="VARCHAR" />
+			<result property="visibility" column="SFKJ" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectXwdtList" resultMap="news" parameterType="java.util.Map">
+  	<![CDATA[
+	SELECT ID,BT,FBRQ ,ZW,SFKJ
+	FROM(
+  		SELECT ID,BT,FBRQ ,SFKJ,ZW,ROWNUM rn
+  		FROM(
+    		SELECT ID,BT,TO_CHAR(FBRQ,'YYYY-MM-DD') FBRQ,SFKJ, substr(ZW, 0, 40) ZW
+    		FROM LM_XWDT  
+    		WHERE SSLM_DM=#{columnId}
+    		ORDER BY FBRQ DESC)A 
+  		WHERE ROWNUM<#{endNum}+1)B 
+	WHERE B.RN>#{startNum}-1				
+  	]]>
+	</select>
+	<select id="selectXwdtAmount" resultType="int" parameterType="string">
+  	<![CDATA[
+	SELECT COUNT(1) 
+	FROM  LM_XWDT 
+	WHERE SSLM_DM=#{columnId}			
+  	]]>
+	</select>
+	
+	<select id="selectZcfgList" resultMap="news" parameterType="java.util.Map">
+  	<![CDATA[
+	SELECT ID,BT,FBRQ ,ZW
+	FROM(
+  		SELECT ID,BT,FBRQ ,ZW,ROWNUM rn
+  		FROM(
+    		SELECT ID,BT,TO_CHAR(FBRQ,'YYYY-MM-DD') FBRQ, substr(ZW, 0, 40) ZW
+    		FROM LM_ZCFG V,LM  T
+    		WHERE V.SSLM_DM=T.LM_DM AND T.SJLM_DM=#{columnId}
+    		ORDER BY FBRQ DESC)A 
+  		WHERE ROWNUM<#{endNum}+1)B 
+	WHERE B.RN>#{startNum}-1				
+  	]]>
+	</select>
+	<select id="selectZcfgAmount" resultType="int" parameterType="string">
+  	<![CDATA[
+	SELECT COUNT(1) 
+	FROM LM_ZCFG V,LM  T
+    WHERE V.SSLM_DM=T.LM_DM AND T.SJLM_DM=#{columnId}			
+  	]]>
+	</select>
+	
+	<select id="selectTsclList" resultMap="news" parameterType="java.util.Map">
+  	<![CDATA[
+	SELECT ID,BT,FBRQ ,ZW,SFKJ
+	FROM(
+  		SELECT ID,BT,FBRQ ,SFKJ,ZW,ROWNUM rn
+  		FROM(
+    		SELECT ID,BT,TO_CHAR(FBRQ,'YYYY-MM-DD') FBRQ,SFKJ, substr(ZW, 0, 40) ZW
+    		FROM LM_TSXX  
+    		WHERE SSLM_DM=#{columnId}
+    		ORDER BY FBRQ DESC)A 
+  		WHERE ROWNUM<#{endNum}+1)B 
+	WHERE B.RN>#{startNum}-1				
+  	]]>
+	</select>
+	<select id="selectTsclAmount" resultType="int" parameterType="string">
+  	<![CDATA[
+	SELECT COUNT(1) 
+	FROM  LM_TSXX
+	WHERE SSLM_DM=#{columnId}			
+  	]]>
+	</select>
+	
+	
+	<delete id="deleteXwdtById" parameterType="String" flushCache="true">
+	<![CDATA[
+		DELETE FROM LM_XWDT WHERE ID=#{id}
+	]]>	
+	</delete>
+	
+	
+	<delete id="deleteZcfgById" parameterType="String" flushCache="true">
+	<![CDATA[
+		DELETE FROM LM_ZCFG WHERE ID=#{id}
+	]]>		
+	</delete>
+	
+	
+	<delete id="deleteTsclById" parameterType="String" flushCache="true">
+	<![CDATA[
+		DELETE FROM LM_TSXX WHERE ID=#{id}
+	]]>		
+	</delete>
+	
+	<update id="upXwdtStaById" flushCache="true" parameterType="News">
+	<![CDATA[
+		UPDATE LM_XWDT SET SFKJ=#{visibility} WHERE ID=#{id}
+	]]>	
+	</update>
+	
+	<select id="selectXwdtNewsById" parameterType="News" resultMap="news">
+	<![CDATA[
+	SELECT ID,
+		   SSLM_DM,
+		   RKSJ,
+		   YSURL,
+		   BT,
+		   TO_CHAR(FBRQ,'YYYY-MM-DD') FBRQ,
+		   ZW,
+		   FJURL,
+		   LJURL,
+		   XXLY,
+		   SFKJ 
+	FROM LM_XWDT 
+	WHERE SSLM_DM=#{columnId} 
+	AND  ID=#{id}
+	]]>		
+	</select>	
+	<select id="selectTsxxNewsById" parameterType="News" resultMap="news">
+	<![CDATA[
+	SELECT ID,
+		   SSLM_DM,
+		   RKSJ,
+		   YSURL,
+		   BT,
+		   TO_CHAR(FBRQ,'YYYY-MM-DD') FBRQ,
+		   ZW,
+		   FJURL,
+		   LJURL,
+		   XXLY,
+		   SFKJ 
+	FROM LM_TSXX 
+	WHERE SSLM_DM=#{columnId} 
+	AND  ID=#{id}
+	]]>		
+	</select>	
+	<select id="selectZcfgNewsById" parameterType="News" resultMap="news">
+	<![CDATA[
+	SELECT ID,
+		   SSLM_DM,
+		   RKSJ,
+		   YSURL,
+		   BT,
+		   TO_CHAR(FBRQ,'YYYY-MM-DD') FBRQ,
+		   ZW,
+		   FJURL,
+		   LJURL,
+		   XXLY,
+		   YXX,
+		   FWZH 
+	FROM LM_ZCFG 
+	WHERE ID=#{id}
+	]]>		
+	</select>	
+	
+	<update id="updateXwdtNews" flushCache="true" parameterType="News">	
+	<![CDATA[
+		UPDATE LM_XWDT SET 
+			BT=#{title},
+			YSURL=#{sourceurl},
+			FBRQ=TO_DATE(#{time},'YYYY-MM-DD'),
+			ZW=#{textContent},
+			XXLY=#{channel},
+			LJURL=#{imageurl},
+			FJURL=#{fileurl},
+			SFKJ=#{visibility} 
+		WHERE ID=#{id}
+	]]>	
+	</update>
+	
+	<update id="updateTsxxNews" flushCache="true" parameterType="News">	
+	<![CDATA[
+		UPDATE LM_TSXX SET 
+			BT=#{title},
+			YSURL=#{sourceurl},
+			FBRQ=TO_DATE(#{time},'YYYY-MM-DD'),
+			ZW=#{textContent},
+			XXLY=#{channel},
+			LJURL=#{imageurl},
+			FJURL=#{fileurl},
+			SFKJ=#{visibility} 
+		WHERE ID=#{id}
+	]]>	
+	</update>
+	
+	<update id="updateZcfgNews" flushCache="true" parameterType="News">	
+	<![CDATA[
+		UPDATE LM_ZCFG SET 
+			BT=#{title},
+			YSURL=#{sourceurl},
+			FBRQ=TO_DATE(#{time},'YYYY-MM-DD'),
+			ZW=#{textContent},
+			XXLY=#{channel},
+			LJURL=#{imageurl},
+			FJURL=#{fileurl},			
+			YXX=#{effective},
+			FWZH=#{issueNumber} 
+		WHERE ID=#{id}
+	]]>	
+	</update>
+
+
+
+
+</mapper>

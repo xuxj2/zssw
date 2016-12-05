@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	
+	<!--获取spring bean 的工具类  -->
+	<bean id="beanUtil" class="com.zrsf.common.util.SpringBeanUtil"></bean>
+	
+	
+	<!--应用中心 -->
+	<bean id="applicationDao" class="com.zrsf.appcenter.ApplicationDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="applicationService" class="com.zrsf.appcenter.ApplicationService">
+		<property name="dao" ref="applicationDao" />
+	</bean>
+	
+<!-- 网页抓取=====================================开始
+	
+	<bean id="zgsjGrabService" class="com.zrsf.backup.service.ZGSJGrabService">
+		<property name="dao" ref="zgsjGrabServiceDao" />
+	</bean>
+	 -->	
+	 <bean id="zgsjGrabServiceDao" class="com.zrsf.backup.dao.ZGSJGrabDao">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+<!-- 网页抓取=====================================结束 -->
+
+
+
+<!-- 通讯录=====================================开始 -->
+	<bean id="txlDao" class="com.zrsf.forclient.dao.TxlDao">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="txlService" class="com.zrsf.forclient.service.TxlService">
+		<property name="dao" ref="txlDao" />
+		<property name="service" ref="shuixinService"></property>
+	</bean>
+<!-- 通讯录=====================================结束 -->
+
+
+	<bean id="timerJobDao" class="com.zrsf.backup.dao.TimerJobDao">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+
+	<bean id="swrydao" class="com.zrsf.forclient.dao.SwryDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="swryService" class="com.zrsf.forclient.service.SwryService">
+		<property name="dao" ref="swrydao" />
+	</bean>
+	
+	<bean id="dhsqDao" class="com.zrsf.forclient.dao.DhsqDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	
+	<bean id="dhsqService" class="com.zrsf.forclient.service.DhsqService">
+		<property name="dao" ref="dhsqDao" />
+	</bean>
+	
+	<bean id="dbrwDao" class="com.zrsf.forclient.dao.DbrwDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	
+	<bean id="dbrwService" class="com.zrsf.forclient.service.DbrwService">
+		<property name="dao" ref="dbrwDao" />
+	</bean>	
+	<bean id="shuixinDao" class="com.zrsf.msgpush.ShuixinDao">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	
+	<bean id="shuixinService" class="com.zrsf.msgpush.ShuixinService">
+		<property name="dao" ref="shuixinDao" />
+		<property name="notificationer" ref="NotificationPush" />
+	</bean>
+	
+	<bean id="individuationDao" class="com.zrsf.forclient.dao.IndividuationDao">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>	
+	<bean id="individuationService" class="com.zrsf.forclient.service.IndividuationService">
+		<property name="dao" ref="individuationDao" />
+	</bean>
+
+	
+	
+	
+<!-- =========报表查询======================= -->
+	<bean id="bbcxDao" class="com.zrsf.forclient.dao.BbcxDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	
+	<bean id="bbcxService" class="com.zrsf.forclient.service.BbcxService">
+		<property name="dao" ref="bbcxDao" />
+	</bean>
+	<bean id="gcbbcxService" class="com.zrsf.forclient.service.GcbbcxService">
+		<property name="dao" ref="bbcxDao" />
+	</bean>		
+	
+	<bean id="lmtsDao" class="com.zrsf.backup.dao.LmtsDao">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+
+	<bean id="recieveService" class="com.zrsf.backup.service.RecieveService">
+		<property name="dao" ref="lmtsDao" />
+		<property name="service" ref="shuixinService" />
+	</bean>
+
+
+
+
+
+
+<!-- =============================================================== -->
+	<!-- MINA   维持长连接的类库                                                          -->
+	<!-- =============================================================== -->
+
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="java.net.SocketAddress">
+					<bean class="org.apache.mina.integration.beans.InetSocketAddressEditor" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="xmppserver" class="com.zrsf.push.xmpp.XmppServer" />
+	<bean id="xmppHandler" class="com.zrsf.push.xmpp.net.XmppIoHandler" />
+
+	<bean id="filterChainBuilder"
+		class="org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder">
+		<property name="filters">
+			<map>
+				<entry key="executor">
+					<bean class="org.apache.mina.filter.executor.ExecutorFilter" />
+				</entry>
+				<entry key="codec">
+					<bean class="org.apache.mina.filter.codec.ProtocolCodecFilter">
+						<constructor-arg>
+							<bean class="com.zrsf.push.xmpp.codec.XmppCodecFactory" />
+						</constructor-arg>
+					</bean>
+				</entry>
+				<!--
+				<entry key="logging">
+					<bean class="org.apache.mina.filter.logging.LoggingFilter" />
+				</entry>
+				-->
+			</map>
+		</property>
+	</bean>
+
+	<bean id="ioAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor"
+		init-method="bind" destroy-method="unbind">
+		<property name="defaultLocalAddress" value=":7222" />
+		<property name="handler" ref="xmppHandler" />
+		<property name="filterChainBuilder" ref="filterChainBuilder" />
+		<property name="reuseAddress" value="true" />
+	</bean>
+	<bean id="serviceLocator" class="com.zrsf.push.service.ServiceLocator" scope="singleton" /> 
+	<!--  mima类库  -->
+	
+	<!-- 推送消息service -->
+	<bean id="NotificationManager" class="com.zrsf.push.xmpp.push.NotificationManager"/>
+	
+	<bean id="NotificationPush" class="com.zrsf.push.xmpp.console.Notification">
+	    <property name="notificationManager" ref="NotificationManager"/>
+	</bean>
+	
+     <!-- 推送消息service -->
+
+
+</beans>

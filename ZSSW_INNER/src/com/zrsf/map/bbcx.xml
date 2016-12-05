@@ -1,0 +1,466 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.map.bbcx">
+<cache />
+
+<!-- 登记户数 -->
+	<resultMap type="DjhsbbVo" id="djhsMap">
+		<result property="swjgdm" column="SWJG_DM" javaType="string" jdbcType="VARCHAR" />
+		<result property="swjgmc" column="MC" javaType="string" jdbcType="VARCHAR" />
+		<result property="qyhs" column="QYHS" javaType="int" jdbcType="INTEGER" />
+		<result property="gths" column="GTHS" javaType="int" jdbcType="INTEGER" />
+		<result property="zchs" column="ZCHS" javaType="int" jdbcType="INTEGER" />
+		<result property="fzchs" column="FCHS" javaType="int" jdbcType="INTEGER" />
+		<result property="tyhs" column="TYHS" javaType="int" jdbcType="INTEGER" />		
+	</resultMap>
+	<select id="selectDjhs" parameterType="java.util.HashMap" resultMap="djhsMap">	
+	<![CDATA[	
+	SELECT 
+  		DECODE(SIGN(LENGTH(DJ.SWJG_DM)-8),-1,DJ.SWJG_DM,'')	SWJG_DM,
+        DJ.SWJG_MC	MC,  	
+  		DJ.QYNSRHS QYHS,
+  		DJ.GTNSRHS GTHS,
+  		DJ.ZCHS ZCHS,
+  		DJ.FCHS FCHS,
+  		DJ.TYHS TYHS  		
+	FROM SHUIXIN.BB_DJHS DJ 	
+	WHERE DJ.NF=#{nf}
+	AND DJ.YF=#{yf} 
+	AND DJ.SWJG_DM LIKE #{swjg}
+	ORDER BY SWJG_DM
+	]]>
+	</select>
+	
+	<!-- 登记户数变动DjhsbdbbVo -->
+	<resultMap type="DjhsbdbbVo" id="djhbdsMap">
+		<result property="swjgdm" column="SWJG_DM" javaType="string" jdbcType="VARCHAR" />
+		<result property="swjgmc" column="MC" javaType="string" jdbcType="VARCHAR" />
+		<result property="qchs" column="QCHS" javaType="int" jdbcType="INTEGER" />				
+		<result property="qmhs" column="QMHS" javaType="int" jdbcType="INTEGER" />		
+	</resultMap>
+	<select id="selectDjhsbd" parameterType="java.util.HashMap" resultMap="djhbdsMap">	
+	<![CDATA[
+	SELECT 
+	  DECODE(SIGN(LENGTH(BD.SWJG_DM)-8),-1,BD.SWJG_DM,'')	SWJG_DM,
+      BD.SWJG_MC	MC,  	
+      DJ.QYNSRHS+DJ.GTNSRHS QCHS,          
+      BD.QYNSRHS+BD.GTNSRHS QMHS
+	FROM SHUIXIN.BB_DJHS DJ, SHUIXIN.BB_DJHS BD
+    WHERE DJ.NF=BD.NF AND DJ.YF+1=BD.YF AND DJ.SWJG_DM=BD.SWJG_DM  	
+	AND BD.NF=#{nf}  
+	AND BD.YF=#{yf}
+	AND BD.SWJG_DM LIKE #{swjg}
+	ORDER BY SWJG_DM
+	]]>
+	</select>
+	
+
+<!-- 准期申报率 -->
+	<resultMap type="ZqsblVo" id="zqsblMap">
+		<result property="swjgdm" column="SWJGDM" javaType="string" jdbcType="VARCHAR" />
+		<result property="swjgmc" column="SWJGMC" javaType="string" jdbcType="VARCHAR" />
+		<result property="ysbhs" column="YSBH" javaType="int" jdbcType="INTEGER" />
+		<result property="yisbhs" column="YSBHS" javaType="int" jdbcType="INTEGER" />
+		<result property="sbl" column="SBL" javaType="double" jdbcType="DOUBLE" />
+		<result property="zqsbhs" column="ZQSBHS" javaType="int" jdbcType="INTEGER" />
+		<result property="zqsbl" column="ZQSBL" javaType="double" jdbcType="DOUBLE" />
+	</resultMap>
+	<select id="selectZqsbl" parameterType="java.util.HashMap" resultMap="zqsblMap">	
+	<![CDATA[		
+	SELECT 
+		DECODE(SIGN(LENGTH(SB.SWJG_DM)-8),-1,SB.SWJG_DM,'')	SWJGDM,
+  		SB.SWJG_MC SWJGMC,
+  		SB.YSBH YSBH,
+  		SB.YSBHS+SB.ZQSBHS YSBHS,
+  		ROUND((SB.YSBHS+SB.ZQSBHS)/SB.YSBH*100,2) SBL,
+  		SB.ZQSBHS ZQSBHS,
+  		SB.ZQSBL ZQSBL
+	FROM BB_SBL SB
+	WHERE NF=#{nf} 
+	AND YF=#{yf} 
+	AND SWJG_DM LIKE #{swjg}
+	ORDER BY SWJG_DM
+	]]>
+	</select>
+
+
+
+	
+<!-- 准期入库率 -->
+	<resultMap type="ZqrklVo" id="zqrklMap">
+		<result property="swjgdm" column="SWJGDM" javaType="string" jdbcType="VARCHAR" />
+		<result property="swjgmc" column="SWJGMC" javaType="string" jdbcType="VARCHAR" />
+		<result property="yrkje" column="YRKJE" javaType="double" jdbcType="DOUBLE" />
+		<result property="yirkje" column="YIRKJE" javaType="double" jdbcType="DOUBLE" />
+		<result property="rkl" column="RKL" javaType="double" jdbcType="DOUBLE" />
+		<result property="yrkhs" column="YRKHS" javaType="int" jdbcType="INTEGER" />
+		<result property="zqrkhs" column="ZQRKHS" javaType="int" jdbcType="INTEGER" />
+		<result property="zqrkl" column="ZQRKL" javaType="double" jdbcType="DOUBLE" />
+	</resultMap>
+	<select id="selectZqrkl" parameterType="java.util.HashMap" resultMap="zqrklMap">	
+	<![CDATA[		
+	SELECT 
+		DECODE(SIGN(LENGTH(RK.SWJG_DM)-8),-1,RK.SWJG_DM,'')	SWJGDM,
+  		RK.SWJG_MC SWJGMC,
+  		RK.YRKHS YRKHS,
+  		RK.ZQRKHS ZQRKHS,
+  		RK.ZQRKL ZQRKL,
+  		RK.YRK_JE YRKJE,
+  		RK.YIRK_JE YIRKJE, 
+  		RK.RKL RKL
+	FROM BB_RKL RK
+	WHERE NF=#{nf} 
+	AND YF=#{yf} 
+	AND SWJG_DM LIKE #{swjg}
+	ORDER BY SWJG_DM	
+	]]>
+	</select>
+
+
+<!-- 欠税增减率 -->
+	<resultMap type="QszjlVo" id="qszjlMap">
+		<result property="swjgdm" column="SWJGDM" javaType="string" jdbcType="VARCHAR" />
+		<result property="swjgmc" column="SWJGMC" javaType="string" jdbcType="VARCHAR" />
+		<result property="qcqsje" column="QCJE" javaType="double" jdbcType="DOUBLE" />
+		<result property="xzqsje" column="XZJE" javaType="double" jdbcType="DOUBLE" />
+		<result property="qqskje" column="QQJE" javaType="double" jdbcType="DOUBLE" />
+		<result property="qmqsje" column="QMJE" javaType="double" jdbcType="DOUBLE" />
+		<result property="qszjl" column="QSZJL" javaType="double" jdbcType="DOUBLE" />		
+	</resultMap>
+	<select id="selectQszjl" parameterType="java.util.HashMap" resultMap="qszjlMap">	
+	<![CDATA[		
+	SELECT 
+		DECODE(SIGN(LENGTH(QS.SWJG_DM)-8),-1,QS.SWJG_DM,'')	SWJGDM,
+  		QS.SWJG_MC SWJGMC,
+  		QS.QCQS_JE QCJE,
+  		QS.XZQS_JE XZJE, 
+  		QS.QQSK_JE QQJE, 
+  		QS.QMQS_JE QMJE, 
+  		QS.QSZJL QSZJL 
+	FROM BB_QSZJL QS
+	WHERE NF=#{nf} 
+	AND YF=#{yf} 
+	AND SWJG_DM LIKE #{swjg}
+	ORDER BY SWJG_DM	
+	]]>
+	</select>
+
+
+<!-- 逾期申报处罚率 -->
+	<resultMap type="YqsbcflVo" id="yqsbcflMap">
+		<result property="swjgdm" column="SWJGDM" javaType="string" jdbcType="VARCHAR" />
+		<result property="swjgmc" column="SWJGMC" javaType="string" jdbcType="VARCHAR" />
+		<result property="yqsbhs" column="YQHS" javaType="int" jdbcType="INTEGER" />
+		<result property="cfhs" column="CFHS" javaType="int" jdbcType="INTEGER" />
+		<result property="yqsbcfl" column="CFL" javaType="double" jdbcType="DOUBLE" />		
+	</resultMap>
+	<select id="selectYqsbcfl" parameterType="java.util.HashMap" resultMap="yqsbcflMap">	
+	<![CDATA[		
+	SELECT 
+		DECODE(SIGN(LENGTH(CF.SWJG_DM)-8),-1,CF.SWJG_DM,'')	SWJGDM,
+  		CF.SWJG_MC SWJGMC,
+  		CF.YQSBHS YQHS,
+  		CF.CFHS CFHS, 
+  		CF.YQSBCFL CFL 
+	FROM BB_YQSBCFL CF
+	WHERE NF=#{nf} 
+	AND YF=#{yf} 
+	AND SWJG_DM LIKE #{swjg}
+	ORDER BY SWJG_DM	
+	]]>
+	</select>
+
+
+	<!-- 任务准期完成率 -->
+	<resultMap type="RwzqwclVo" id="rwzqwclMap">
+		<result property="swjgdm" column="SWJGDM" javaType="string" jdbcType="VARCHAR" />
+		<result property="swjgmc" column="SWJGMC" javaType="string" jdbcType="VARCHAR" />
+		<result property="ywcrws" column="YWCS" javaType="int" jdbcType="INTEGER" />
+		<result property="zqwcrws" column="ZQWCS" javaType="int" jdbcType="INTEGER" />
+		<result property="rwzqwcl" column="ZQWCL" javaType="double" jdbcType="DOUBLE" />		
+	</resultMap>
+	<select id="selectRwzqwcl" parameterType="java.util.HashMap" resultMap="rwzqwclMap">	
+	<![CDATA[		
+	SELECT 
+		DECODE(SIGN(LENGTH(RW.SWJG_DM)-8),-1,RW.SWJG_DM,'')	SWJGDM,
+  		RW.SWJG_MC SWJGMC,
+  		RW.YWCRWS YWCS,
+  		RW.ZQWCRWS ZQWCS, 
+  		RW.RWZQWCL ZQWCL 
+	FROM BB_RWZQWCL RW
+	WHERE NF=#{nf} 
+	AND YF=#{yf} 
+	AND SWJG_DM LIKE #{swjg}
+	ORDER BY SWJG_DM	
+	]]>
+	</select>
+
+
+<!-- 税收统计报表 -->
+<resultMap type="SstjRowVo" id="rowMap">
+	<result property="c0" column="SWJG_DM" javaType="string" jdbcType="VARCHAR" />
+	<result property="c1" column="MC" javaType="string" jdbcType="VARCHAR" />
+	<result property="c2" column="L1" javaType="java.lang.Double" jdbcType="DOUBLE" />
+	<result property="c3" column="L2" javaType="java.lang.Double" jdbcType="DOUBLE" />
+	<result property="c4" column="L3" javaType="java.lang.Double" jdbcType="DOUBLE" />
+	<result property="c5" column="L4" javaType="java.lang.Double" jdbcType="DOUBLE" />
+	<result property="c6" column="L6" javaType="java.lang.Double" jdbcType="DOUBLE" />
+	<result property="c7" column="L7" javaType="java.lang.Double" jdbcType="DOUBLE" />
+	<result property="c8" column="L8" javaType="java.lang.Double" jdbcType="DOUBLE" />			
+</resultMap>
+<!-- 
+<select id="selectGcbb1" parameterType="java.util.HashMap" resultMap="rowMap">	
+	<![CDATA[		
+	SELECT MC,ROUND(L1/10000,0) AS L1,L3 AS L2,ROUND(L5/10000,0) AS L3,L7 AS L4
+	FROM DB_ZGXT.SF_SJFXBB_MX MX,DB_ZGXT.SF_SJFXBB_SCLB SC 
+	WHERE SC.SC_XH=MX.SC_XH 
+	AND SC.SC_XH>18 AND SC.SC_XH<33 
+	AND  SWJG_DM=#{swjg}	
+	AND SSQ=#{ssq}
+	ORDER BY XH
+	]]>
+	</select>
+ -->
+	<select id="selectGcbb1" parameterType="java.util.HashMap" resultMap="rowMap">	
+	<![CDATA[		
+	SELECT MC,ROUND(L1/10000,0) AS L1,L4 AS L2,ROUND(L5/10000,0) AS L3,L8 AS L4
+	FROM DB_ZGXT.SF_SJFXBB_MX MX
+	WHERE MX.SC_XH=39
+	AND SSQ=#{ssq}
+	ORDER BY XH
+	]]>
+	</select>
+	
+	<select id="selectGcbb2" parameterType="java.util.HashMap" resultMap="rowMap">	
+	<![CDATA[		
+	SELECT DY.MC,DY.L1/10000 AS L1,DY.L3 AS L2,LJ.L1/10000 AS L3,LJ.L3 AS L4
+	FROM DB_ZGXT.SF_SJFXBB_MX DY, DB_ZGXT.SF_SJFXBB_MX LJ,SHUIXIN.BB_QX_SSTJQX QX
+	WHERE DY.SC_XH+3=LJ.SC_XH AND DY.XH=LJ.XH AND DY.SSQ=LJ.SSQ AND  DY.SC_XH=QX.SC_XH AND DY.XH=QX.XH
+	AND DY.SC_XH=33
+	AND QX.XYQX LIKE #{swjg}||'%'	
+	AND DY.SSQ=#{ssq}
+	ORDER BY DY.XH
+	]]>
+	</select>
+	
+	<select id="selectGcbb3" parameterType="java.util.HashMap" resultMap="rowMap">	
+	<![CDATA[		
+	SELECT DY.MC,DY.L1/10000 AS L1,DY.L3 AS L2,LJ.L1/10000 AS L3,LJ.L3 AS L4
+	FROM DB_ZGXT.SF_SJFXBB_MX DY, DB_ZGXT.SF_SJFXBB_MX LJ,SHUIXIN.BB_QX_SSTJQX QX
+	WHERE DY.SC_XH+3=LJ.SC_XH AND DY.XH=LJ.XH AND DY.SSQ=LJ.SSQ AND  DY.SC_XH=QX.SC_XH AND DY.XH=QX.XH
+	AND DY.SC_XH=35
+	AND QX.XYQX LIKE #{swjg}||'%'	
+	AND DY.SSQ=#{ssq}
+	ORDER BY DY.XH
+	]]>
+	</select>
+
+	<select id="selectGcbb4" parameterType="java.util.HashMap" resultMap="rowMap">	
+	<![CDATA[		
+	SELECT YJ.SSQ,YJ.SWJG_MC MC,YJ.BYYJ AS L1,YJ.BYTB AS L2,YJ.BNLJ AS L3,YJ.LJTB AS L4,
+			YJ.SNTQ AS L6,YJ.SYSZ AS L7,YJ.SNLJ AS L8
+	FROM SHUIXIN.BB_SSSRYJ YJ
+	WHERE  YJ.SSQ=#{ssq}
+	]]>
+	</select>
+
+	<select id="selectGcbb5" parameterType="java.util.HashMap" resultMap="rowMap">	
+	<![CDATA[		
+	SELECT YJ.SSQ,YJ.SWJG_MC MC,YJ.BYYJ AS L1,YJ.BYTB AS L2,YJ.BNLJ AS L3,YJ.LJTB AS L4,
+			YJ.SNTQ AS L6,YJ.SYSZ AS L7,YJ.SNLJ AS L8
+	FROM SHUIXIN.BB_CZYSYJ YJ
+	WHERE  YJ.SSQ=#{ssq}
+	]]>
+	</select>
+	
+	
+	<select id="selectGcbb6" parameterType="java.util.HashMap" resultType="map">	
+	<![CDATA[		
+	SELECT TO_CHAR(ROUND(gxdyrk))||'万元' AS "gxdyrk",
+       	   TO_CHAR(ROUND(gxljrk))||'万元' AS "gxljrk",
+       	   TO_CHAR(gxljzf,'FM99990.90')||'%' AS "gxljzf",
+       	   TO_CHAR(ROUND(ssdysb))||'万元' AS "ssdysb",
+       	   TO_CHAR(ROUND(ssdyrk)) ||'万元'AS "ssdyrk",
+       	   TO_CHAR(ROUND(ssljrk))||'万元' AS "ssljrk",
+       	   TO_CHAR(ssljzf,'FM9990.90')||'%' AS "ssljzf",
+       	   TO_CHAR(ROUND(ysdysb))||'万元' AS "ysdysb",
+       	   TO_CHAR(ROUND(ysdyrk))||'万元' AS "ysdyrk",
+       	   TO_CHAR(ROUND(ysljrk))||'万元' AS "ysljrk",
+       	   TO_CHAR(ysljzf,'FM9990.90')||'%' AS "ysljzf",
+       	   TO_CHAR(ROUND(jmdysb))||'万元' AS "jmdysb",
+       	   TO_CHAR(ROUND(jmljsb))||'万元' AS "jmljsb",
+       	   TO_CHAR(jmljzf,'FM9990.90')||'%' AS "jmljzf"
+	FROM (
+	(SELECT L1/10000  AS gxdyrk,L5/10000  AS gxljrk,L8  AS gxljzf FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=39 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR})FULL JOIN
+	(SELECT L1/10000  AS ssdyrk,L5/10000  AS ssljrk,L8  AS ssljzf FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=39 AND XH=2 AND SSQ=#{ssq,jdbcType=VARCHAR}) ON 1=1 FULL JOIN
+	(SELECT L1/10000  AS ssdysb FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=42 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR})  ON 1=1 FULL JOIN
+	(SELECT L7/10000  AS ysdyrk  FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=35 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR})  ON 1=1 FULL JOIN
+	(SELECT L1/10000  AS ysdysb  FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=43 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR})  ON 1=1 FULL JOIN
+	(SELECT L7/10000  AS ysljrk,L9  AS ysljzf FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=38 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR})  ON 1=1 FULL JOIN
+	(SELECT L1/10000  AS jmdysb,L5/10000  AS jmljsb,L8  AS jmljzf FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=41 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR}) ON 1=1)
+	]]>
+	</select>
+	
+	
+	<!-- 税收收入分行业表 -->
+	<select id="selectGcbb7" parameterType="java.util.HashMap" resultMap="rowMap">	
+	<![CDATA[		
+	SELECT MC,ROUND(L1/10000,0) AS L1,L4 AS L2,ROUND(L5/10000,0) AS L3,L8 AS L4
+	FROM DB_ZGXT.SF_SJFXBB_MX MX
+	WHERE MX.SC_XH=40
+	AND SSQ=#{ssq}
+	ORDER BY XH
+	]]>
+	</select>
+	
+	<!-- 减免税分减免事项表 -->
+	<select id="selectGcbb8" parameterType="java.util.HashMap" resultMap="rowMap">	
+	<![CDATA[		
+	SELECT MC,ROUND(L1/10000,0) AS L1,L4 AS L2,ROUND(L5/10000,0) AS L3,L8 AS L4
+	FROM DB_ZGXT.SF_SJFXBB_MX MX
+	WHERE MX.SC_XH=41
+	AND SSQ=#{ssq}
+	ORDER BY XH
+	]]>
+	</select>
+	
+	
+	<select id="checkDjhs" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT COUNT(1)	
+	FROM SHUIXIN.BB_DJHS DJ 	
+	WHERE DJ.NF=#{nf}
+	AND DJ.YF=#{yf} 
+	]]>
+	</select>
+	
+	<select id="checkZqsbl" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT COUNT(1)	
+	FROM BB_SBL SB
+	WHERE NF=#{nf} 
+	AND YF=#{yf} 
+	]]>
+	</select>
+	
+	<select id="checkZqrkl" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT COUNT(1)	
+	FROM BB_RKL RK
+	WHERE NF=#{nf} 
+	AND YF=#{yf}  
+	]]>
+	</select>
+		
+	<select id="checkQszjl" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT COUNT(1)	
+	FROM BB_QSZJL QS
+	WHERE NF=#{nf} 
+	AND YF=#{yf} 
+	]]>
+	</select>	
+	
+	
+	<select id="checkRwzqwcl" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT COUNT(1)	
+	FROM BB_RWZQWCL RW
+	WHERE NF=#{nf} 
+	AND YF=#{yf} 
+	]]>
+	</select>			
+	
+	
+	<select id="checkYqsbcfl" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT COUNT(1)	
+	FROM BB_YQSBCFL CF
+	WHERE NF=#{nf} 
+	AND YF=#{yf} 
+	]]>
+	</select>	
+	
+	
+	<select id="checkGcbb1" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT COUNT(1)	
+	FROM DB_ZGXT.SF_SJFXBB_MX MX
+	WHERE MX.SC_XH=39
+	AND SSQ=#{ssq}
+	ORDER BY XH
+	]]>
+	</select>		
+		
+		
+	<select id="checkGcbb2" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT COUNT(1)	
+	FROM DB_ZGXT.SF_SJFXBB_MX DY, DB_ZGXT.SF_SJFXBB_MX LJ,SHUIXIN.BB_QX_SSTJQX QX
+	WHERE DY.SC_XH+3=LJ.SC_XH AND DY.XH=LJ.XH AND DY.SSQ=LJ.SSQ AND  DY.SC_XH=QX.SC_XH AND DY.XH=QX.XH
+	AND DY.SC_XH=33	
+	AND DY.SSQ=#{ssq}
+	]]>
+	</select>
+	
+	<select id="checkGcbb3" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT COUNT(1)	
+	FROM DB_ZGXT.SF_SJFXBB_MX DY, DB_ZGXT.SF_SJFXBB_MX LJ,SHUIXIN.BB_QX_SSTJQX QX
+	WHERE DY.SC_XH+3=LJ.SC_XH AND DY.XH=LJ.XH AND DY.SSQ=LJ.SSQ AND  DY.SC_XH=QX.SC_XH AND DY.XH=QX.XH
+	AND DY.SC_XH=35	
+	AND DY.SSQ=#{ssq}
+	]]>
+	</select>
+	
+	<select id="checkGcbb4" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT count(1)
+	FROM SHUIXIN.BB_SSSRYJ YJ
+	WHERE  YJ.SSQ=#{ssq}
+	]]>
+	</select>
+	
+	<select id="checkGcbb5" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT count(1)
+	FROM SHUIXIN.BB_CZYSYJ YJ
+	WHERE  YJ.SSQ=#{ssq}
+	]]>
+	</select>
+	
+	<select id="checkGcbb6" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT count(1)
+	FROM (
+	(SELECT L1/10000  AS gxdyrk,L5/10000  AS gxljrk,L8  AS gxljzf FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=39 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR}) JOIN
+	(SELECT L1/10000  AS ssdyrk,L5/10000  AS ssljrk,L8  AS ssljzf FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=39 AND XH=2 AND SSQ=#{ssq,jdbcType=VARCHAR}) ON 1=1  JOIN
+	(SELECT L1/10000  AS ssdysb FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=42 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR})  ON 1=1  JOIN
+	(SELECT L7/10000  AS ysdyrk  FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=35 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR})  ON 1=1  JOIN
+	(SELECT L1/10000  AS ysdysb  FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=43 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR})  ON 1=1  JOIN
+	(SELECT L7/10000  AS ysljrk,L9  AS ysljzf FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=38 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR})  ON 1=1  JOIN
+	(SELECT L1/10000  AS jmdysb,L5/10000  AS jmljsb,L8  AS jmljzf FROM DB_ZGXT.SF_SJFXBB_MX WHERE SC_XH=41 AND XH=1 AND SSQ=#{ssq,jdbcType=VARCHAR}) ON 1=1)
+	]]>
+	</select>
+	
+	<select id="checkGcbb7" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT count(1)
+	FROM DB_ZGXT.SF_SJFXBB_MX MX
+	WHERE MX.SC_XH=40
+	AND SSQ=#{ssq}
+	]]>
+	</select>
+	
+	<select id="checkGcbb8" parameterType="java.util.HashMap" resultType="INTEGER">	
+	<![CDATA[	
+	SELECT count(1)
+	FROM DB_ZGXT.SF_SJFXBB_MX MX
+	WHERE MX.SC_XH=41
+	AND SSQ=#{ssq}
+	]]>
+	</select>
+	
+</mapper>

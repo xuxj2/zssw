@@ -1,0 +1,37 @@
+<!-- <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.map.renewSetup">
+
+<cache />
+	
+	<resultMap type="NewsSynsVo" id="synsMap">
+		<id property="lmdm" column="LM_DM" javaType="string" jdbcType="VARCHAR" />
+		<result property="exp" column="EXPRESSION" javaType="string"	jdbcType="VARCHAR" />	
+		<result property="lastTime" column="SCTBSJ" javaType="string"	jdbcType="VARCHAR" />
+		<result property="sftb" column="SFTB" javaType="string"	jdbcType="VARCHAR" />	
+		<result property="tssj" column="TSSJ" javaType="string"	jdbcType="VARCHAR" />
+			
+	</resultMap>
+	<select id="selectAllExp" parameterType="String" resultMap="synsMap">
+ 		<![CDATA[ 			
+ 			select LM_DM,EXPRESSION,SCTBSJ,SFTB,TSSJ from LM_TB_TBCL 
+ 		]]>
+ 	</select>
+
+ 	<select id="selectExp" parameterType="String" resultType="String">
+ 		<![CDATA[
+ 			select EXPRESSION from LM_TB_TBCL where lm_dm=#{lmid}
+ 		]]>
+ 	</select>
+ 	
+ 	<update id="updateLastTime" parameterType="NewsSynsVo">
+ 		<![CDATA[
+ 		UPDATE LM_TB_TBCL SET SCTBSJ=TO_TIMESTAMP(#{lastTime},'YYYY-MM-DD HH24:MI:SS') WHERE LM_DM=#{lmdm}
+ 		]]>
+ 	</update>
+ 	
+ 	
+ 
+</mapper> -->

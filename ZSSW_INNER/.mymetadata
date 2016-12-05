@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="ZSSW_INNER"
+  id="myeclipse.1386206603188"
+  context-root="/shuixin"
+  j2ee-spec="5.0"
+  archive="ZSSW_INNER.war">
+  <attributes>
+    <attribute name="webrootdir" value="/WebRoot" />
+  </attributes>
+</project-module>
+

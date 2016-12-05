@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.map.zgsjrk">
+	<cache />
+
+
+<insert id="insertDjhs" parameterType="java.util.Map">
+<![CDATA[
+  		INSERT INTO BB_DJHS(
+  			SWJG_DM,
+			NF,
+			YF,
+			QYNSRHS,
+			GTNSRHS,
+			ZCHS,
+			FCHS,
+			TYHS,			
+			SJSWJG_DM,
+			SWJG_MC
+  			)
+		VALUES(  	
+			#{swjgDm,jdbcType=VARCHAR},
+			#{year,jdbcType=VARCHAR},
+			#{month,jdbcType=VARCHAR}, 
+			#{qyhs,jdbcType=VARCHAR}, 
+			#{gths,jdbcType=VARCHAR},
+			#{zchs,jdbcType=VARCHAR},
+			#{fzchs,jdbcType=VARCHAR},
+			#{tyhs,jdbcType=VARCHAR},
+			#{sjjg,jdbcType=VARCHAR},
+			#{swjgMc,jdbcType=VARCHAR})  	
+  	]]>
+	</insert>
+
+	<delete id="deleteDjhs"  parameterType="java.util.Map" >
+		DELETE FROM BB_DJHS WHERE NF= #{year,jdbcType=VARCHAR}   AND YF=#{month,jdbcType=VARCHAR}
+	</delete>
+
+
+	<!-- 准期申报率 -->
+	<insert id="insertZqsbl" parameterType="java.util.Map">
+  	<![CDATA[
+  		INSERT INTO BB_SBL(
+  			SWJG_DM,
+  			NF,
+  			YF,
+  			YSBHS,
+  			ZQSBHS,
+  			YSBH,
+  			ZQSBL,
+  			SBL,
+  			SJSWJG,
+  			SWJG_MC)
+		VALUES(
+			#{swjgDm,jdbcType=VARCHAR},
+			#{year,jdbcType=VARCHAR},
+			#{month,jdbcType=VARCHAR}, 
+			#{yqsbhs,jdbcType=VARCHAR}, 
+			#{zqsbhs,jdbcType=VARCHAR},
+			#{ysbhs,jdbcType=VARCHAR},
+			#{zqsbv,jdbcType=VARCHAR},
+			#{yqsbv,jdbcType=VARCHAR},
+			#{sjjg,jdbcType=VARCHAR},
+			#{swjgMc,jdbcType=VARCHAR})  	
+  	]]>
+	</insert>
+	
+	<delete id="deleteZqsbl" parameterType="java.util.Map" >
+		DELETE FROM BB_SBL WHERE NF= #{year,jdbcType=VARCHAR}   AND YF=#{month,jdbcType=VARCHAR}
+	</delete>
+	
+	
+	
+	<!-- 逾期申报处罚率 -->
+	<insert id="insertYqsbcfl" parameterType="java.util.Map">
+  	<![CDATA[
+	INSERT INTO BB_YQSBCFL(
+		SWJG_DM,
+		SWJG_MC,
+		SJSWJG,
+		NF,
+		YF,
+		YQSBHS,
+		CFHS,
+		YQSBCFL)
+	VALUES(
+		#{swjgDm,jdbcType=VARCHAR},		
+		#{swjgMc,jdbcType=VARCHAR},
+		#{sjjg,jdbcType=VARCHAR},
+		#{year,jdbcType=VARCHAR},
+		#{month,jdbcType=VARCHAR}, 
+		#{yqsbycfhs,jdbcType=VARCHAR}, 
+		#{ycfhs,jdbcType=VARCHAR},
+		#{yqsbcfl,jdbcType=VARCHAR}
+			
+	)
+	]]>
+	</insert>
+	<delete id="deleteYqsbcfl" parameterType="java.util.Map" >
+		DELETE FROM BB_YQSBCFL WHERE NF= #{year,jdbcType=VARCHAR}   AND YF=#{month,jdbcType=VARCHAR}
+	</delete>
+	
+	<!-- 欠税增减率 -->
+	<insert id="insertQszjl" parameterType="java.util.Map">
+  	<![CDATA[
+	INSERT INTO BB_QSZJL(
+  		SWJG_DM,
+  		NF,
+  		YF,
+  		QCQS_JE,
+  		XZQS_JE,
+  		QQSK_JE,
+  		QMQS_JE,
+  		QSZJL,
+  		SJSWJG,
+  		SWJG_MC)
+	VALUES(
+		#{swjgDm,jdbcType=VARCHAR}, 
+		#{year,jdbcType=VARCHAR},
+		#{month,jdbcType=VARCHAR},
+		#{zzsndqsye,jdbcType=VARCHAR},
+		#{bnxzqs,jdbcType=VARCHAR},
+		#{bnljqlcq,jdbcType=VARCHAR},
+		#{qmqsye,jdbcType=VARCHAR},
+		#{qszzl,jdbcType=VARCHAR},
+		#{sjjg,jdbcType=VARCHAR},
+		#{swjgMc,jdbcType=VARCHAR})	
+	]]>
+	</insert>
+	<delete id="deleteQszjl" parameterType="java.util.Map" >
+		DELETE FROM BB_QSZJL WHERE NF= #{year,jdbcType=VARCHAR}   AND YF=#{month,jdbcType=VARCHAR}
+	</delete>
+	
+	
+	<!-- 任务准期完成率 -->
+	<insert id="insertRwzqwcl" parameterType="java.util.Map">
+  	<![CDATA[
+	INSERT INTO BB_RWZQWCL(
+		SWJG_DM,
+		SWJG_MC,
+		SJSWJG,
+		NF,
+		YF,
+		ZQWCRWS,  
+		YWCRWS,  
+		RWZQWCL)
+	VALUES(
+		#{swjgDm,jdbcType=VARCHAR},		
+		#{swjgMc,jdbcType=VARCHAR},
+		#{sjjg,jdbcType=VARCHAR},
+		#{year,jdbcType=VARCHAR},
+		#{month,jdbcType=VARCHAR}, 
+		#{jswcrws,jdbcType=VARCHAR}, 
+		#{rwzs,jdbcType=VARCHAR},
+		#{jcrwwcjsl,jdbcType=VARCHAR}		
+	)	
+	]]>
+	</insert>
+	<delete id="deleteRwzqwcl" parameterType="java.util.Map" >
+		DELETE FROM BB_RWZQWCL WHERE NF= #{year,jdbcType=VARCHAR}   AND YF=#{month,jdbcType=VARCHAR}
+	</delete>
+	
+	
+	<!-- 准期入库率-->
+	<insert id="insertZqrkl" parameterType="java.util.Map">
+  	<![CDATA[
+	INSERT INTO BB_RKL(
+		SWJG_DM,
+		SWJG_MC,
+		SJSWJG,
+		NF,
+		YF,
+		YRK_JE,  
+		YIRK_JE, 		  
+		RKL,
+		YRKHS,  
+		ZQRKHS,
+		ZQRKL)
+	VALUES(
+		#{swjgDm,jdbcType=VARCHAR},		
+		#{swjgMc,jdbcType=VARCHAR},
+		#{sjjg,jdbcType=VARCHAR},
+		#{year,jdbcType=VARCHAR},
+		#{month,jdbcType=VARCHAR}, 
+		#{yrkje,jdbcType=VARCHAR}, 
+		#{yirkje,jdbcType=VARCHAR},
+		#{rkl,jdbcType=VARCHAR},
+		#{yrkhs,jdbcType=VARCHAR},
+		#{zqrkhs,jdbcType=VARCHAR},
+		#{zhrkl,jdbcType=VARCHAR}			
+	)
+	]]>
+	</insert>
+	<delete id="deleteZqrkl" parameterType="java.util.Map" >
+		DELETE FROM BB_RKL WHERE NF= #{year,jdbcType=VARCHAR}   AND YF=#{month,jdbcType=VARCHAR}
+	</delete>
+	
+	
+</mapper>

@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	
+	<!-- 系统常量定义，定义上传文件字符集编码 -->
+    <constant name="struts.i18n.encoding" value="UTF-8"></constant>
+	<!-- 系统常量定义，定义上传文件大小（默认2M） ,这里修改为20M-->
+	<constant name="struts.multipart.maxSize" value="20971520"/> 
+	<constant name="struts.multipart.saveDir" value="tmp"/>
+	
+	<constant name="struts.ui.theme" value="simple" /> 
+	<constant name="struts.ui.templateDir" value="template" /> 
+	<constant name="struts.ui.templateSuffix" value="ftl" /> 
+	
+	
+	<package name="globalDefine" extends="json-default">
+	<default-action-ref name="notFound"></default-action-ref>
+	<!--  <constant name="struts.devMode" value="true" /> 
+		<global-results>
+			<result name="Exception">/error.jsp</result>
+			<result name="SqlException">/error.jsp</result>	
+		</global-results>	
+		<global-exception-mappings>
+			<exception-mapping result="SqlException" exception="java.sql.SQLException"></exception-mapping>
+			<exception-mapping result="Exception" exception="java.lang.Exception"></exception-mapping>
+		</global-exception-mappings>	
+		-->
+		<action name="notFound" class="notFoundAction">
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">resp</param>	
+				<param name="excludeNullParameter">true</param>				
+			</result>	
+		</action>
+	</package>
+	
+
+	<package name="forClient" extends="globalDefine">
+		<interceptors>
+			<interceptor name="login" class="com.zrsf.forclient.intercepter.LoginInterceptr"/>		
+			<interceptor-stack name="loginStack">
+				<interceptor-ref name="defaultStack"></interceptor-ref>	
+				<interceptor-ref name="login"></interceptor-ref>									
+			</interceptor-stack>
+		</interceptors>	
+		
+		<global-results>
+			<result name="login" type="chain">
+				<param name="actionName">noLogin</param>	
+				<param name="namespace"></param>	
+			</result>		
+		</global-results>
+		
+		<action name="noLogin" class="noLogin" method="execute">
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">resp</param>	
+				<param name="excludeNullParameter">true</param>				
+			</result>			
+		</action>	
+		<action name="login" class="loginAction" method="execute">
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">resp</param>	
+				<param name="excludeNullParameter">true</param>		
+			</result>			
+		</action>	
+		<!--  		
+		<action name="newsQuery" class="newsQueryAction" method="execute">
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">resp</param>	
+				<param name="excludeNullParameter">true</param>				
+			</result>			
+		</action>
+			
+		-->		
+		<action name="txlmk" class="txlAction" method="execute">
+		<interceptor-ref name="loginStack"></interceptor-ref>
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">resp</param>	
+				<param name="excludeNullParameter">true</param>				
+			</result>			
+		</action>			
+		<action name="bgmk" class="dhsqAction" method="execute">
+		<interceptor-ref name="loginStack"></interceptor-ref>
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">resp</param>	
+				<param name="excludeNullParameter">true</param>				
+			</result>			
+		</action>
+		
+		<action name="dbrw" class="dbrwAction" method="execute">
+		<interceptor-ref name="loginStack"></interceptor-ref>
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">resp</param>	
+				<param name="excludeNullParameter">true</param>				
+			</result>			
+		</action>		
+		
+		<action name="tscl" class="tsclAction" method="execute">		
+			<result name="success" type="json">				
+				<param name="root">swry</param>								
+			</result>			
+		</action>	
+		
+		<action name="zgbbcx" class="zgbbcxAction" method="execute">
+		<interceptor-ref name="loginStack"></interceptor-ref>
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">resp</param>	
+				<param name="excludeNullParameter">true</param>				
+			</result>			
+		</action>	
+		
+		<action name="gcbbcx" class="gcbbcxAction" method="execute">
+		<interceptor-ref name="loginStack"></interceptor-ref>
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">resp</param>	
+				<param name="excludeNullParameter">true</param>				
+			</result>			
+		</action>
+		
+		
+		<action name="grxx_*" class="individuationAction" method="{1}">
+		 <interceptor-ref name="loginStack"></interceptor-ref> 
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">resp</param>	
+				<param name="excludeNullParameter">true</param>				
+			</result>			
+		</action>
+		
+		<action name="push" class="newsPushAction" method="execute">
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="root">push</param>								
+			</result>			
+		</action>	
+		
+		<action name="reportPush" class="com.zrsf.backup.action.ReportPushAction" method="execute">
+			<result name="success" type="json">
+				<param name="contentType">text/html</param>	
+				<param name="includeProperties">year,month</param>								
+			</result>			
+		</action>
+				
+	</package>
+	<include file="struts_manager.xml"></include>
+	<include file="struts_app.xml"></include>
+</struts>    

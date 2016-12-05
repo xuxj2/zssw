@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.map.txl">
+	<cache />
+	<resultMap type="Swry" id="swry">
+		<id property="swryDm" column="swryDm" javaType="string" jdbcType="VARCHAR" />
+		<result property="swryGh" column="swryGh" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="deviceid" column="deviceid" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="xm" column="xm" javaType="string" jdbcType="VARCHAR" />
+		<result property="yddh" column="yddh" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="xb" column="xb" javaType="string" jdbcType="CHAR" />
+		<result property="zw" column="zw" javaType="string" jdbcType="VARCHAR" />
+		<result property="bgdh" column="bgdh" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="rzjgDm" column="rzjgDm" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="jhbj" column="jhbj" javaType="string"
+			jdbcType="CHAR" />
+		<result property="txUri" column="txUri" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="rzjgMc" column="rzjgMc" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="znfw" column="znfw" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zndm" column="zndm" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectSwryById" parameterType="string" resultMap="swry">
+  	<![CDATA[
+  		 SELECT RY.SWRY_DM  AS "swryDm",
+  		 		RY.SWRY_GH  AS "swryGh",
+  				RY.MC 		AS "xm",
+  				RY.YDDH		AS "yddh",
+  				RY.XB		AS "xb",
+  				DM.MC	AS "zw",
+  				RY.BGDH		AS "bgdh",
+  				RY.RZJG_DM    	AS "rzjgDm",
+  				JG.MC_J    	AS "rzjgMc",
+  				'http://61.177.61.251:8222/shuixin/tx/'||NVL(RY.TXTP,'xttx.png') AS "txUri",
+  				RY.DEVICEID AS "deviceid",
+  				RY.SFJH AS "jhbj"
+		  FROM SWRY RY LEFT JOIN  SWJG JG ON RY.RZJG_DM=JG.SWJG_DM LEFT JOIN SWRY_ZW_DM DM	 ON DM.ZW_DM=RY.ZW_MC
+      	  WHERE  RY.SWRY_DM=#{id,jdbcType=VARCHAR}		 
+  	]]>
+	</select>
+
+
+	<!-- 查出所有的联系人 -->
+	<select id="selectAllSwry" resultMap="swry">
+  	<![CDATA[
+  		 SELECT RY.SWRY_DM  AS "swryDm",
+  		 		RY.SWRY_GH  AS "swryGh",
+  				RY.MC 		AS "xm",
+  				RY.YDDH		AS "yddh",
+  				RY.XB		AS "xb",
+  				DM.MC	AS "zw",
+  				RY.BGDH		AS "bgdh",
+  				RY.RZJG_DM    	AS "rzjgDm",
+  				JG.MC_J    	AS "rzjgMc",
+  				'http://61.177.61.251:8222/shuixin/tx/'||NVL(RY.TXTP,'xttx.png') AS "txUri",
+  				RY.DEVICEID AS "deviceid",
+  				RY.SFJH AS "jhbj"
+		 FROM SWRY RY LEFT JOIN  SWJG JG ON RY.RZJG_DM=JG.SWJG_DM LEFT JOIN SWRY_ZW_DM DM ON DM.ZW_DM=RY.ZW_MC	
+		 WHERE XB<>3 	 		 
+		 ORDER BY NLSSORT("xm",'NLS_SORT=SCHINESE_PINYIN_M')
+		 
+  	]]>
+	</select>
+
+	<!-- 所有已激活用户 -->
+	<select id="selectColRecipients" resultMap="swry">
+  	<![CDATA[
+  		 SELECT RY.SWRY_DM  AS "swryDm",  		 		
+        		RY.RZJG_DM    	AS "rzjgDm",  			
+        		RY.DEVICEID AS "deviceid",
+        		RY.SFJH AS "jhbj",
+        		JG.ZNFW AS "znfw"
+		FROM SWRY RY JOIN SWJG JG ON RY.RZJG_DM=JG.SWJG_DM	
+		WHERE RY.SFJH=1			 
+  	]]>
+	</select>
+	<!-- 所有职能范围小于等于7位的已激活用户 -->
+	<select id="selectStaRecipients" resultMap="swry">
+  	<![CDATA[
+  		 SELECT RY.SWRY_DM  AS "swryDm",  		 		
+        		RY.RZJG_DM    	AS "rzjgDm",  			
+        		RY.DEVICEID AS "deviceid",
+        		RY.SFJH AS "jhbj",
+        		JG.ZNFW AS "znfw"
+		FROM SWRY RY JOIN SWJG JG ON RY.RZJG_DM=JG.SWJG_DM	
+		WHERE RY.SFJH=1	AND LENGTH(JG.ZNFW)<8		 
+  	]]>
+	</select>
+
+	<!-- 查询某个税务机构（及其下属机构）的全部人员通讯录 -->
+	<select id="selectSwryBySwjgCc" resultMap="swry" parameterType="java.lang.String">
+		<bind name="swjg" value=" _parameter + '%'" />
+  	<![CDATA[
+  		 SELECT RY.SWRY_DM AS "swryDm", 
+            RY.SWRY_GH AS "swryGh",
+            RY.MC AS "xm", 
+            RY.YDDH AS "yddh", 
+            RY.XB AS "xb", 
+            DM.MC AS "zw", 
+            RY.BGDH AS "bgdh", 
+            RY.RZJG_DM AS "rzjgDm", 
+            JG.MC_J AS "rzjgMc", 
+            'http://61.177.61.251:8222/shuixin/tx/'||NVL(RY.TXTP,'xttx.png') AS "txUri", 
+            RY.DEVICEID AS "deviceid", 
+            RY.SFJH AS "jhbj" 
+      FROM SWRY RY LEFT JOIN  SWJG JG ON RY.RZJG_DM=JG.SWJG_DM LEFT JOIN SWRY_ZW_DM DM	 ON DM.ZW_DM=RY.ZW_MC 
+      WHERE XB<>3 	AND RY.RZJG_DM  like #{swjg,jdbcType=VARCHAR}
+	  order by DM.XH,nlssort("xm",'NLS_SORT=SCHINESE_PINYIN_M')		 
+  	]]>
+	</select>
+
+	<!-- 查询某个税务人员的常用联系人列表  swry-->
+	<select id="selectCylxr" resultMap="swry" parameterType="java.lang.String">
+  	<![CDATA[
+  		SELECT  RY.SWRY_DM  AS "swryDm",
+  		 		RY.SWRY_GH  AS "swryGh",
+  				RY.MC 		AS "xm",
+  				RY.YDDH		AS "yddh",
+  				RY.XB		AS "xb",
+  				(SELECT DM.MC FROM SWRY_ZW_DM DM WHERE DM.ZW_DM=RY.ZW_MC)	AS "zw",
+  				RY.BGDH		AS "bgdh",
+  				RY.RZJG_DM  	AS "rzjgDm",
+  				DECODE(RY.RZJG_DM,NULL,'null',(SELECT JG.MC_J FROM SWJG JG WHERE JG.SWJG_DM=RY.RZJG_DM ))AS "rzjgMc",
+  				'http://61.177.61.251:8222/shuixin/tx/'||NVL(RY.TXTP,'xttx.png') AS "txUri",
+  				RY.DEVICEID AS "deviceid",
+  				RY.SFJH AS "jhbj"
+		FROM SWRY_CYLXR CY
+		JOIN SWRY RY
+		ON CY.LXR_DM =RY.SWRY_DM
+		WHERE CY.SSRY_DM=#{swry,jdbcType=VARCHAR}
+		order by nlssort("xm",'NLS_SORT=SCHINESE_PINYIN_M')
+  	]]>
+	</select>
+
+
+	<!-- 查询所有条线-->
+	<select id="selectAllTx" resultType="java.util.HashMap"
+		parameterType="java.lang.String">
+  	<![CDATA[
+  		SELECT TX_DM AS "tx", TX_MC AS "txmc" FROM TX ORDER BY "tx"
+  	]]>
+	</select>
+
+	<!-- 查询某个条线下所有联系人的列表-->
+	<select id="selectTxlxr" resultMap="swry" parameterType="java.lang.String">
+  	<![CDATA[
+  		SELECT  RY.SWRY_DM  AS "swryDm",
+  		 		RY.SWRY_GH  AS "swryGh",
+  				RY.MC 		AS "xm",
+  				RY.YDDH		AS "yddh",
+  				RY.XB		AS "xb",
+  				(SELECT DM.MC FROM SWRY_ZW_DM DM WHERE DM.ZW_DM=RY.ZW_MC)	AS "zw",
+  				RY.BGDH		AS "bgdh",
+  				RY.RZJG_DM 	AS "rzjgDm",
+  				DECODE(RY.RZJG_DM,NULL,'null',(SELECT JG.MC_J FROM SWJG JG WHERE JG.SWJG_DM=RY.RZJG_DM ))AS "rzjgMc",
+  				'http://61.177.61.251:8222/shuixin/tx/'||NVL(RY.TXTP,'xttx.png') AS "txUri",
+  				RY.DEVICEID AS "deviceid",
+  				RY.SFJH AS "jhbj"
+		FROM TXLXR TX
+		JOIN SWRY RY
+		ON TX.LXR_DM  =RY.SWRY_DM
+		WHERE XB<>3 AND  TX.TX_DM=#{tx,jdbcType=VARCHAR}
+		order by nlssort("xm",'NLS_SORT=SCHINESE_PINYIN_M')
+  	]]>
+	</select>
+
+
+	<!-- 查询某个联系人的详细信息-->
+	<select id="selectJtxx" resultMap="swry" parameterType="java.lang.String">
+  	<![CDATA[
+  	 SELECT  RY.SWRY_DM  AS "swryDm",
+  		 	RY.SWRY_GH  AS "swryGh",
+  			RY.MC 		AS "xm",
+  			RY.YDDH		AS "yddh",
+  			RY.XB		AS "xb",
+  			DM.MC	AS "zw",
+  			RY.BGDH		AS "bgdh",
+  			RY.RZJG_DM 	AS "rzjgDm",
+  			DECODE(RY.RZJG_DM,NULL,'null',(SELECT JG.MC_J FROM SWJG JG WHERE JG.SWJG_DM=RY.RZJG_DM ))AS "rzjgMc",
+  			'http://61.177.61.251:8222/shuixin/tx/'||NVL(RY.TXTP,'xttx.png') AS "txUri",
+  			RY.DEVICEID AS "deviceid",
+  			RY.SFJH AS "jhbj"
+	FROM SWRY RY LEFT JOIN SWRY_ZW_DM DM ON RY.ZW_MC=DM.ZW_DM
+	WHERE RY.SWRY_DM=#{swryDm,jdbcType=VARCHAR}
+  	]]>
+	</select>
+
+	<!-- 查找用户所有订阅号 -->
+	<select id="selectDyh" resultType="java.util.HashMap"
+		parameterType="java.lang.String">
+  	<![CDATA[
+  	SELECT D.DYLM AS "lm",
+  		L.LM_MC     AS "lmMc",
+  		'http://192.168.1.252:8080/shuixin/lmtb/'||NVL(L.LM_TB ,'xt.jpg')    AS "lmTb"
+	FROM SWRY_LMDY D
+	JOIN LM L
+	ON L.LM_DM =D.DYLM
+	WHERE D.DYR=#{swry,jdbcType=VARCHAR}
+  	]]>
+	</select>
+	<!-- 增加订阅号 -->
+	<insert id="insertDyh" parameterType="java.util.HashMap"
+		flushCache="true">	
+		<![CDATA[
+		INSERT INTO SWRY_LMDY(DYR,DYLM) 
+		]]>
+		<foreach collection="lms" index="index" item="lm" separator="union all"
+			close="">
+    	<![CDATA[
+   			select	#{swry,jdbcType=VARCHAR},#{lm,jdbcType=VARCHAR} from dual
+   		]]>
+		</foreach>
+	</insert>
+	<!-- 删除订阅号 -->
+	<delete id="deleteDyh" parameterType="java.util.HashMap"
+		flushCache="true">	
+		<![CDATA[
+		DELETE FROM SWRY_LMDY WHERE DYR=#{swry,jdbcType=VARCHAR} AND DYLM IN
+		]]>
+		<foreach collection="lms" index="index" item="lm" separator=","
+			open="(" close=")">
+    	<![CDATA[
+   			#{lm,jdbcType=VARCHAR}
+   		]]>
+		</foreach>
+	</delete>
+
+
+	<!-- ==================================================== -->
+	<resultMap type="SwjgTxl" id="swjgtxl">
+		<id property="swjgDm" column="swjgDm" javaType="string" jdbcType="VARCHAR" />
+		<result property="swjgMc" column="swjgMc" javaType="string"
+			jdbcType="VARCHAR" />
+		<collection property="swrys" ofType="Swry" column="swjgDm"
+			select="selectSwryBySwjgDm" />
+		<collection property="xjjgs" ofType="SwjgTxl" column="swjgDm"
+			select="selectXjjgBySwjgDm" />
+	</resultMap>
+
+	<!-- 查找出地税局完整的组织结构，包含各级机构及各机构下的人员 -->
+	<select id="selectOrgCatchSwry" resultMap="swjgtxl"
+		parameterType="java.lang.String" useCache="true">
+  	<![CDATA[
+	SELECT 
+    	JG.SWJG_DM AS "swjgDm", 
+    	JG.MC_J      AS "swjgMc"  
+	FROM SWJG JG 
+	WHERE JG.SWJG_DM= #{swjgDm,jdbcType=VARCHAR}
+  	]]>
+	</select>
+	<!-- 按税务机关代码查找该机关的所有下级机关 -->
+	<select id="selectXjjgBySwjgDm" resultMap="swjgtxl"
+		parameterType="java.lang.String">		
+  	<![CDATA[
+  		SELECT 
+  			SWJG_DM AS "swjgDm",
+  			MC AS "swjgMc"
+  		FROM SWJG 
+  		WHERE XY_BJ='1' 
+  		AND SJSWJG_DM=#{swjgDm,jdbcType=VARCHAR}
+  		ORDER BY SWJG_DM
+  	]]>
+	</select>
+
+	<!-- 按税务机关代码查找该机关下所有任职人员：查找任职机关代码为指定机关代码（swryDm）的所有人员 -->
+	<select id="selectSwryBySwjgDm" resultMap="swry" parameterType="java.lang.String">		
+  	<![CDATA[
+  	    SELECT RY.SWRY_DM  AS "swryDm",
+  		 		RY.SWRY_GH  AS "swryGh",
+  				RY.MC 		AS "xm",
+  				RY.YDDH		AS "yddh",
+  				RY.XB		AS "xb",
+  				DM.MC	AS "zw",
+  				RY.BGDH		AS "bgdh",
+  				RY.RZJG_DM  	AS "rzjgDm",
+  				JG.MC_J  	AS "rzjgMc",
+  				'http://61.177.61.251:8222/shuixin/tx/'||NVL(RY.TXTP,'xttx.png') AS "txUri",
+  				RY.DEVICEID AS "deviceid",
+  				RY.SFJH AS "jhbj"
+		 FROM SWRY RY LEFT JOIN  SWJG JG ON RY.RZJG_DM=JG.SWJG_DM LEFT JOIN SWRY_ZW_DM DM	 ON DM.ZW_DM=RY.ZW_MC
+     	 WHERE XB<>3 AND RY.RZJG_DM= #{swjgDm,jdbcType=VARCHAR}
+		 order by DM.XH,nlssort("xm",'NLS_SORT=SCHINESE_PINYIN_M')		
+  	]]>
+	</select>
+	<!-- ========================================= -->
+
+	<resultMap type="SwjgTxl" id="txlzz">
+		<id property="swjgDm" column="swjgDm" javaType="string" jdbcType="VARCHAR" />
+		<result property="swjgMc" column="swjgMc" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="swjgCc" column="swjgCc" javaType="String"
+			jdbcType="VARCHAR" />
+		<!--
+			<discriminator javaType="int" column="jc" > <case value="0"
+			resultMap="txlzz"> <collection property="xjjgs" ofType="SwjgTxl"
+			column="swjgDm" select="selectSwjgZzWithSwry" /> </case> <case
+			value="1" resultMap="swry"> <collection property="swrys"
+			ofType="Swry" column="swjgCc" select="selectSwryBySwjg" /> </case>
+			</discriminator>
+		-->
+	</resultMap>
+
+	<select id="selectSwjgZzWithSwry" resultMap="txlzz"
+		parameterType="java.lang.String">		
+		<![CDATA[	
+			SELECT 
+    			JG.SWJG_DM AS "swjgDm", 
+    			JG.MC_J      AS "swjgMc",
+    			JG.CC	AS "swjgCc",
+    			CASE 	
+        			WHEN LENGTH(JG.CC)<8 THEN 0
+        			ELSE 1
+      			END AS "jc" 
+			FROM SWJG JG 
+			WHERE  JG.XY_BJ=1 
+			AND JG.SJSWJG_DM=#{swjgDm,jdbcType=VARCHAR}
+			ORDER BY JG.XH
+  		]]>
+	</select>
+
+
+
+	<select id="selectSwryByDeviceId" resultType="java.lang.String"
+		parameterType="java.lang.String">
+  	<![CDATA[
+  	SELECT  RY.SWRY_DM  AS "swryDm"  		 	
+	FROM SWRY RY
+	WHERE RY.DEVICEID=#{deviceid,jdbcType=VARCHAR}
+  	]]>
+	</select>
+
+	<update id="updateDyh" parameterType="java.lang.String"
+		statementType="CALLABLE">
+		{call P_UPDATE_SUBSCRIPTION(
+		#{lms,jdbcType=VARCHAR,mode=IN}
+		,#{swryDm,jdbcType=VARCHAR,mode=IN})}
+	</update>
+
+
+	<select id="selectDeviceId" resultMap="swry" parameterType="java.lang.String">		
+		<![CDATA[	
+			SELECT DEVICEID AS "deviceid",
+				   SWRY_DM AS "swryDm"
+			FROM SWRY WHERE SWRY_DM IN
+		]]>
+		<foreach collection="list" index="index" item="swrydm"
+			separator="," close=")" open="(">
+    	<![CDATA[
+   				#{swrydm,jdbcType=VARCHAR}
+   		]]>
+		</foreach>
+
+	</select>
+
+
+	<!-- 查看具有某些权限的联系人 -->
+	<select id="selectSwryByPermissions" parameterType="int"
+		resultMap="swry">
+  	<![CDATA[
+  		 SELECT RY.SWRY_DM  AS "swryDm",
+  		 		RY.SWRY_GH  AS "swryGh",
+  				RY.MC 		AS "xm",
+  				RY.YDDH		AS "yddh",
+  				RY.XB		AS "xb",
+  				DM.MC	AS "zw",
+  				RY.BGDH		AS "bgdh",
+  				RY.RZJG_DM    	AS "rzjgDm",
+  				JG.MC_J    	AS "rzjgMc",
+  				'http://61.177.61.251:8222/shuixin/tx/'||NVL(RY.TXTP,'xttx.png') AS "txUri",
+  				RY.DEVICEID AS "deviceid",
+  				RY.SFJH AS "jhbj"
+		  FROM SWRY RY LEFT JOIN  SWJG JG ON RY.RZJG_DM=JG.SWJG_DM LEFT JOIN SWRY_ZW_DM DM	 ON DM.ZW_DM=RY.ZW_MC
+      	  WHERE  BITAND(HTQX,#{permissions,jdbcType=INTEGER})=#{permissions,jdbcType=INTEGER} 
+  	]]>
+	</select>
+
+
+
+	<!-- 移除用户某项权限 -->
+	<update id="removePermission" parameterType="map">
+		update swry set
+		htqx=F_REMOVE_PERMISSION(HTQX,#{permission,jdbcType=INTEGER}) where
+		swry_gh=#{swryGh,jdbcType=VARCHAR}
+</update>
+
+	<!-- 给用户添加某项权限 -->
+	<update id="addPermission" parameterType="map">
+	<![CDATA[
+	update swry set htqx=F_Add_PERMISSION(HTQX,#{permission,jdbcType=INTEGER}) 
+	where swry_gh in
+	]]>
+		<foreach collection="ghs" item="swryGh" open="(" separator=","
+			close=")">
+			#{swryGh,jdbcType=VARCHAR}
+	</foreach>
+	</update>
+
+	<resultMap id="lmdyMap" type="LmdyVo">
+		<result property="swryDm" column="DYR" />
+		<result property="deviceId" column="DEVICEID" />
+		<collection property="dylms" ofType="string">
+			<result column="DYLM" />
+		</collection>
+	</resultMap>
+
+	<select id="selectLmdy" resultMap="lmdyMap">
+	<![CDATA[
+	SELECT DY.DYR,DY.DYLM ,RY.DEVICEID
+	FROM SWRY_LMDY DY,SWRY RY
+	WHERE RY.SWRY_DM=DY.DYR
+	AND DYLM IN
+	 ]]>
+		<foreach collection="array" open="(" close=")" separator=","
+			item="lmid">
+		 <![CDATA[ #{lmid}]]>
+		</foreach>
+	</select>
+</mapper>
+
+

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.manage.manager">
+    <resultMap type="Tiaoxian" id="tiaoxian">
+        <id property="txDm" column="txdm" jdbcType="VARCHAR"/> 
+        <result property="txMc" column="txmc" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap type="zw" id="zw" >
+    	<id property="zwDm" column="zwdm" jdbcType="VARCHAR" />
+    	<result property="zw" column="mc" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap type="rzjg" id="rzjg">
+    	<id property="rzjgDm" column="rzjgdm" jdbcType="VARCHAR"/>
+    	<result property="rzjg" column="rzjg" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap type="TxlJsonBean" id="txlJsonBeanMap">
+        <result property="id" column="ID" jdbcType="VARCHAR"/> 
+        <result property="pId" column="PID" jdbcType="VARCHAR"/>
+        <result property="name" column="NAME" jdbcType="VARCHAR"/> 
+        <result property="checked" column="CHECKED" jdbcType="VARCHAR"/>
+        <result property="open" column="OPEN" jdbcType="VARCHAR"/>         
+    </resultMap>
+ 
+   
+    <!-- 查询所有条线-->
+	<select id="selectAllTx" resultType="tiaoxian"
+		parameterType="java.util.Map">
+  	<![CDATA[
+  		SELECT TX_DM AS "txdm",TX_MC AS "txmc" 
+  		FROM( 
+  			SELECT A.TX_DM,A.TX_MC,ROWNUM RN
+  			FROM(
+  				SELECT TX_DM,TX_MC
+  				FROM TX ORDER BY TX_DM
+  			)A
+  			WHERE ROWNUM<#{endNum}
+  		)
+  		WHERE RN>#{startNum}
+  	]]>
+	</select>
+		<select id="selectTx" resultType="tiaoxian"
+		parameterType="java.util.Map">
+  	<![CDATA[
+  		SELECT TX_DM AS "txdm",TX_MC AS "txmc" 
+  		FROM( 
+  			SELECT A.TX_DM,A.TX_MC,ROWNUM RN
+  			FROM(
+  				SELECT TX_DM,TX_MC
+  				FROM TX 
+  				WHERE TX_MC LIKE '%'||#{txmc}||'%'
+  			)A
+  			WHERE ROWNUM<#{endNum}
+  		)
+  		WHERE RN>#{startNum}
+  	]]>
+	</select>
+	<select id="selectTxAmount" resultType="int" >
+  	<![CDATA[
+	SELECT COUNT(1) 
+	FROM  TX		
+  	]]>
+	</select>
+    <!-- 查询条线下所有联系人 -->
+    <select id="selectTxlxr" resultType="java.lang.String"  parameterType="java.lang.String">
+        <![CDATA[
+        	SELECT LXR_DM 
+        	FROM TXLXR
+        	WHERE TX_DM=#{tx}
+        ]]>
+    </select>
+    <!--更新条线  -->
+    <update id="updateTx" parameterType="java.util.Map"  flushCache="true">
+        <![CDATA[
+        	UPDATE TX SET TX_MC=#{txmc} WHERE TX_DM=#{txid}
+        ]]>
+    </update>
+    <!-- 添加条线联系人 -->
+    <insert id="insertTxlxr"  parameterType="java.util.Map" flushCache="true">
+        <![CDATA[
+        INSERT INTO TXLXR(TX_DM,LXR_DM)
+			VALUES (#{txid,jdbcType=VARCHAR},#{txlxr,jdbcType=VARCHAR})
+        ]]>
+    </insert>
+    <!-- 删除条线联系人 -->
+    <delete id="deleteTxlxr" parameterType="java.util.Map" flushCache="true">
+        <![CDATA[
+        DELETE FROM TXLXR WHERE TX_DM=#{txid} AND LXR_DM=#{txlxr}
+        ]]>
+    </delete>
+    <!-- 查询条线名称 -->
+    <select id="selectTxmc" parameterType="java.lang.String" resultType="java.lang.String">
+        <![CDATA[
+        SELECT TX_MC FROM TX WHERE TX_DM=#{txid}
+        ]]>
+    </select>
+    <!-- 新建条线 -->
+    <insert id="insertTx" parameterType="java.util.Map" >
+        <![CDATA[
+        		INSERT INTO TX(TX_DM,TX_MC)
+        		VALUES(#{txid,jdbcType=VARCHAR},#{txmc,jdbcType=VARCHAR})
+        ]]>
+    </insert>
+    <delete id="deleteTx" parameterType="java.lang.String">
+        <![CDATA[
+        	DELETE FROM TX WHERE TX_DM=#{tx}
+        ]]>
+    </delete>
+    <select id="selectRy" parameterType="java.lang.String" resultType="java.lang.String">
+    	<![CDATA[
+    		SELECT DYR FROM SWRY_LMDY WHERE DYLM=#{dylm}
+    	]]>
+    </select>
+    <insert id="insertLmdy" parameterType="java.util.Map" flushCache="true">
+    <![CDATA[
+    	INSERT INTO SWRY_LMDY(DYLM,DYR)VALUES(#{dylm,jdbcType=VARCHAR},#{dyr,jdbcType=VARCHAR})
+    ]]>
+    </insert>
+    <delete id="deleteLmRy" parameterType="java.util.Map" flushCache="true">
+    <![CDATA[
+    	DELETE FROM SWRY_LMDY WHERE DYLM=#{dylm} AND DYR=#{dyr}
+    ]]>
+    </delete>
+    <select id="selectZw"  resultType="zw">
+    <![CDATA[
+    	SELECT A.ZW_DM AS "zwdm",A.MC AS "zw" FROM SWRY_ZW_DM A ORDER BY A.XH  
+    ]]>
+    </select>
+    <select id="selectRzjg" resultType="rzjg" parameterType="java.lang.String">
+    <![CDATA[
+    	SELECT A.SWJG_DM AS "rzjgdm",A.MC_J AS "rzjg" FROM SWJG A 
+    ]]>
+    </select>
+     <resultMap type="swryWh" id="swryWh">
+    	<result property="xm" column="xm" jdbcType="VARCHAR"/>
+    	<result property="sex" column="'sex" jdbcType="VARCHAR" />
+    	<result property="zwDm" column="zwdm" jdbcType="VARCHAR"/>
+    	<result property="rzjgDm" column="rzjgdm" jdbcType="VARCHAR"/>
+    	<result property="gh" column="gh" jdbcType="VARCHAR"/>
+    	<result property="jhbj" column="jhbj" jdbcType="VARCHAR"/>
+    	<result property="deviceid" column="deviceid" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="selectSwry" resultType="swryWh" parameterType="java.lang.String">
+    <![CDATA[
+    	SELECT RY.MC AS "xm",RY.XB AS "sex",RY.ZW_MC AS "zwdm",
+    	RY.RZJG_DM AS "rzjgdm",RY.SWRY_GH AS "gh",RY.SFJH AS "jhbj" ,RY.DEVICEID AS "deviceid"
+    	FROM SWRY RY  WHERE RY.SWRY_DM=#{swryDm}
+    ]]>
+    </select>
+    <update id="updateSwry" parameterType="java.util.Map"  flushCache="true">
+    <![CDATA[
+    	UPDATE SWRY RY SET RY.RZJG_DM=#{rzjgDm},RY.ZW_MC=#{zwDm},RY.DEVICEID=#{deviceid},RY.SFJH=#{jhbj} 
+    	WHERE RY.SWRY_DM=#{swryDm}
+    ]]>
+    </update>
+    <update id="updateSwrys" parameterType="java.util.Map" flushCache="true">
+    <![CDATA[
+    	UPDATE SWRY RY SET RY.RZJG_DM=#{rzjgDm},RY.ZW_MC=#{zwDm}
+    	WHERE RY.SWRY_DM=#{swryDm}
+    ]]>
+    </update>
+    
+    <select id="selectSwjg" resultMap="txlJsonBeanMap">
+    <![CDATA[
+    	SELECT SWJG_DM ID,MC_J NAME,SJSWJG_DM PID FROM SWJG 
+    ]]>
+    </select>
+    
+     <select id="selectSelectable" resultMap="txlJsonBeanMap" parameterType="int">
+      <![CDATA[
+    	SELECT SWRY_GH  ID,MC NAME,RZJG_DM PID FROM SWRY WHERE BITAND(HTQX,#{permission,jdbcType=INTEGER})<>#{permission,jdbcType=INTEGER}
+     ]]>
+    
+    </select>
+    
+</mapper>

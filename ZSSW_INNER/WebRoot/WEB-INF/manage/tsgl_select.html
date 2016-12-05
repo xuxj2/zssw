@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>掌上税务后台</title>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/bootstrap-responsive.min.css" />
+
+	<link rel="stylesheet" href="css/uniform.css" />
+	<link rel="stylesheet" href="css/unicorn.main.css" />
+	<link rel="stylesheet" href="css/unicorn.grey.css" class="skin-color" />
+	<link rel="stylesheet" href="css/zTreeStyle/zTreeStyle.css" type="text/css">
+
+	<script src="js/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/jquery.ui.custom.js"></script>
+	<script src="js/unicorn.js"></script>
+	<script src="js/jquery.uniform.js"></script>
+	<script type="text/javascript" src="js/jquery.ztree.core-3.5.js"></script>
+	<script type="text/javascript" src="js/jquery.ztree.excheck-3.5.js"></script>
+	<script type="text/javascript" src="js/zTree-use.js"></script>
+	<script type="text/javascript" language="javascript">
+		var zNodes = [      /**自定义的数据源，ztree支持json,数组，xml等格式的**/
+			{id:0, pId:-1, name:"中国", open:true},
+			{id:1, pId:0, name:"北京"}, 
+			{id:2, pId:0, name:"天津"},
+			{id:3, pId:0, name:"上海"}, 
+			{id:6, pId:0, name:"重庆"}, 
+			{id:4, pId:0, name:"河北省", open:false}, 
+			{id:41, pId:4, name:"石家庄"}, 
+			{id:42, pId:4, name:"保定"}, 
+			{id:43, pId:4, name:"邯郸"}, 
+			{id:44, pId:4, name:"承德"}, 
+			{id:5, pId:0, name:"广东省", open:false}, 
+			{id:51, pId:5, name:"广州"}, 
+			{id:52, pId:5, name:"深圳"}, 
+			{id:53, pId:5, name:"东莞"}, 
+			{id:54, pId:5, name:"佛山"}, 
+			{id:6, pId:0, name:"福建省", open:false}, 
+			{id:61, pId:6, name:"福州"}, 
+			{id:62, pId:6, name:"厦门"}, 
+			{id:63, pId:6, name:"泉州"}, 
+			{id:64, pId:6, name:"三明"},
+			{id:7, pId:0, name:"四川省", open:true},
+			{id:71, pId:7, name:"成都"},
+			{id:72, pId:7, name:"绵阳"},
+			{id:73, pId:7, name:"自贡"},
+			{id:711, pId:71, name:"金牛区"},
+			{id:712, pId:71, name:"锦江区"},
+			{id:7111, pId:711, name:"九里堤"},
+			{id:7112, pId:711, name:"火车北站"}
+		];
+	</script>
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+	<div id="header">
+		<a href="index.html">
+			<image src="img/logo.png"/>
+			<span>苏州地税掌上税务2期后台管理系统</span>
+		</a>
+	</div>
+	<!-- 右按扭组 -->
+	<div id="user-nav" class="navbar navbar-inverse">
+		<ul class="nav btn-group">
+			<li class="btn btn-inverse">
+				<a title="" href="#"> <i class="icon icon-user"></i>
+					<span class="text">杨朝辉</span>
+				</a>
+			</li>
+			<li class="btn btn-inverse">
+				<a title="" href="login.html"> <i class="icon icon-share-alt"></i>
+					<span class="text">退出系统</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+	<!-- 左边菜单栏 -->
+	<div id="sidebar">
+		<ul>
+			<li>
+				<a href="index.html">
+					<i class="icon icon-th-list"></i>
+					<span>信息维护</span>
+				</a>
+			</li>
+			<li>
+				<a href="tbcl.html">
+					<i class="icon icon-refresh"></i>
+					<span>同步策略</span>
+				</a>
+			</li>
+			<li>
+				<a href="txgl.html">
+					<i class="icon icon-random"></i>
+					<span>条线管理</span>
+				</a>
+			</li>
+			<li class="active">
+				<a href="tsgl.html">
+					<i class="icon icon-share"></i>
+					<span>推送管理</span>
+				</a>
+			</li>
+			<li>
+				<a href="rzgl.html">
+					<i class="icon icon-calendar"></i>
+					<span>日志管理</span>
+				</a>
+			</li>
+			<li>
+				<a href="yhgl.html">
+					<i class="icon icon-user"></i>
+					<span>用户管理</span>
+				</a>
+			</li>
+			<li>
+				<a href="tzgl.html">
+					<i class="icon icon-envelope"></i>
+					<span>通知管理</span>
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	<div id="content">
+		<div id="content-main">
+			<div id="content-header">
+				<h1>推送管理</h1>
+			</div>
+			<div id="breadcrumb">
+				<a href="index.html" title="回到首页" class="tip-bottom">
+					<i class="icon-home"></i>
+					首页
+				</a>
+				<a href="tbcl.html" class="current">推送管理</a>
+			</div>
+			<div class="container-fluid">
+				<div class="row-fluid">
+					<div class="span5">
+						<div class="widget-box">
+							<div class="widget-title">
+								<h5>人员结构</h5>
+							</div>
+							<div class="widget-content">
+							</div>
+						</div>
+					</div>
+					<div class="span2">
+						<div class="widget-box">
+							<div class="widget-content">
+								
+							</div>
+						</div>
+					</div>
+					<div class="span5">
+						<div class="widget-box">
+							<div class="widget-title">
+								<h5>接收人员</h5>
+							</div>
+							<div class="widget-content">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="fl-right">
+					<button class="btn btn-primary">确定</button>
+					<button class="btn btn-primary">取消</button>
+				</div>
+			</div>
+		</div>
+		<div class="row-fluid">
+			<div id="footer" class="span12">2013 &copy; 苏州地方税务局——掌上税务2期后台管理系统</div>
+		</div>
+	</div>
+</body>
+</html>

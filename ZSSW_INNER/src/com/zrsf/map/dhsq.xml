@@ -1,0 +1,1563 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.map.dhsq">
+	<cache />
+	<select id="selectNsrByKeys" parameterType="java.util.Map"
+		resultType="map">
+			<![CDATA[
+			 select b.swglm as "swglm",
+  					b.nsr_mc     as "mc"
+			 from
+  				(select a.swglm,
+    					a.nsr_mc ,
+    					rownum rn
+  				 from
+     				(select nsr.swglm ,
+      						nsr.nsr_mc
+    				 from shuixin.swjg jg,db_zgxt.t_dj_jgnsr nsr
+    				 where (  	(jg.zn_dm='1'and nsr.gljg_dm like jg.znfw ||'%')
+    						 or (jg.zn_dm='2'and nsr.zsjg_dm like jg.znfw ||'%')
+    						 or (jg.zn_dm='3'and nsr.jcjg_dm like jg.znfw ||'%')
+    						 or (jg.zn_dm='4'and nsr.jiancjg_dm like jg.znfw ||'%')
+    						 or (jg.zn_dm='5'and nsr.fwjg_dm like jg.znfw ||'%') )
+    				]]>
+		<if test="mcs != null ">
+			<foreach collection="mcs" index="index" item="mc" open=""
+				separator=" " close=" ">
+				<![CDATA[
+    				and nsr.nsr_mc like '%' || #{mc,jdbcType=VARCHAR} ||'%'
+    			]]>
+			</foreach>
+		</if>
+		<if test="swglm!= null">
+				<![CDATA[
+    				 and nsr.swglm like '%' ||#{swglm,jdbcType=VARCHAR} ||'%'
+    			 ]]>
+		</if> 
+    			<![CDATA[
+    				 and jg.swjg_dm=#{gljg,jdbcType=VARCHAR}
+    				 order by swglm
+    		 		)a
+    	
+    		 	]]>
+    	
+    	 <![CDATA[
+    	  WHERE ROWNUM<#{endNum}    	 
+  			 ) b
+			 where b.rn>#{startNum}
+			 ]]>
+	</select>
+	
+	<!-- 查询符合条件的纳税人总数 -->
+	<select id="selectSumNsrByKeys" parameterType="java.util.Map"
+		resultType="int" useCache="true">
+	<![CDATA[
+	select count(nsr.swglm) 
+    from shuixin.swjg jg,db_zgxt.t_dj_jgnsr nsr
+    where (  	(jg.zn_dm='1'and nsr.gljg_dm like jg.znfw ||'%')
+    			 or (jg.zn_dm='2'and nsr.zsjg_dm like jg.znfw ||'%')
+    			 or (jg.zn_dm='3'and nsr.jcjg_dm like jg.znfw ||'%')
+    			 or (jg.zn_dm='4'and nsr.jiancjg_dm like jg.znfw ||'%')
+    			 or (jg.zn_dm='5'and nsr.fwjg_dm like jg.znfw ||'%') )
+    				]]>
+		<if test="mcs != null ">
+			<foreach collection="mcs" index="index" item="mc" open=""
+				separator=" " close=" ">
+				<![CDATA[
+    				and nsr.nsr_mc like '%' || #{mc,jdbcType=VARCHAR} ||'%'
+    			]]>
+			</foreach>
+		</if>
+		<if test="swglm!= null">
+				<![CDATA[
+    				 and nsr.swglm like '%' ||#{swglm,jdbcType=VARCHAR} ||'%'
+    			 ]]>
+		</if> 
+    	<![CDATA[
+    				 and jg.swjg_dm=#{gljg,jdbcType=VARCHAR}
+    	]]>
+	</select>
+
+
+	<!-- 查询权限： -->
+	<select id="selectQx" parameterType="java.util.Map" resultType="int">	
+	<![CDATA[
+	select 1 
+	from shuixin.swjg jg,db_zgxt.t_dj_jgnsr nsr
+	where (    (jg.zn_dm='1'and nsr.gljg_dm like jg.znfw ||'%')
+       		or (jg.zn_dm='2'and nsr.zsjg_dm like jg.znfw ||'%')
+       		or (jg.zn_dm='3'and nsr.jcjg_dm like jg.znfw ||'%')
+       		or (jg.zn_dm='4'and nsr.jiancjg_dm like jg.znfw ||'%')
+    	 	or (jg.zn_dm='5'and nsr.fwjg_dm like jg.znfw ||'%') )                 
+	and jg.swjg_dm=#{gljg,jdbcType=VARCHAR}
+	and nsr.swglm=#{swglm,jdbcType=VARCHAR}
+	 ]]>
+	</select>
+
+	<!-- 纳税人基本情况查询 -->
+	<resultMap type="NsrGeneral" id="nsrJbxxMap">
+		<id property="swglm" column="SWGLM" javaType="string" jdbcType="BIGINT" />
+		<result property="nsrsbm" column="NSRSBM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="mc" column="NSR_MC" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zzjgdmzh" column="ZZJGTYDM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="gsdjzh" column="PZWH" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="yyzzzh" column="ZZHM" javaType="string"
+			jdbcType="CHAR" />
+		<result property="zczb" column="ZCZB" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="address" column="SJJYDZ" javaType="string"
+			jdbcType="CHAR" />
+		<result property="tel" column="SCJYDLXDH" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zy" column="JYFWZY" javaType="string"
+			jdbcType="VARCHAR" />
+			
+		<result property="hyml" column="HYML" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="hydl" column="HYDL" javaType="string"
+			jdbcType="VARCHAR" />
+			
+		<result property="sshy" column="GBHY" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zclx" column="ZCLX" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="sgqx" column="QYSDSZGQX" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zsfs" column="QYSDSZSFS" javaType="string"
+			jdbcType="VARCHAR" />
+		<!--
+			<result property="grzsfs" column="GRSDSZSFS" javaType="string"
+			jdbcType="VARCHAR" /> <result property="jy" column="JYFWJY"
+			javaType="string" jdbcType="VARCHAR" />
+		-->
+		<result property="nsrzt" column="NSRZT" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zcdz" column="ZCDZ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zcddh" column="ZCDLXDH" javaType="string"
+			jdbcType="VARCHAR" />
+			
+		<result property="jcjg" column="JCJGMC" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="gljg" column="GLJGMC" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectNsrJbqk" parameterType="string" resultMap="nsrJbxxMap">	
+	<![CDATA[
+	  SELECT NSR.SWGLM ,
+       NSR.NSRSBM , 
+       NSR.NSR_MC,
+       FB.ZZJGTYDM, 
+       FB.PZWH,        
+       FB.ZZHM||'('||(SELECT ZZ.MC FROM DB_ZGXT.T_DM_DJ_ZZLB ZZ WHERE ZZ.ZZLB_DM= FB.ZZLB_DM)||')' AS ZZHM,   
+       (SELECT LTRIM(MAX(SYS_CONNECT_BY_PATH(B.TZJE,';')),';')
+         FROM
+          (SELECT SWGLM,(SELECT DM.MC_J from DB_ZGXT.T_DM_GY_BZ DM WHERE DM.BZ_DM=A.BZ_DM) ||' '||A.JE TZJE,ROWNUM RN
+           FROM  
+            (SELECT TZ.SWGLM,
+                    TZ.BZ_DM,
+                    SUM(TZ_JE) ||'万元' JE
+             FROM DB_ZGXT.T_DJ_TZFZCZB TZ 
+             WHERE TZ.SWGLM=#{swglm,jdbcType=VARCHAR} 
+             GROUP BY TZ.SWGLM,TZ.BZ_DM ) A
+            )B
+          START WITH RN=1
+          CONNECT BY RN-1=PRIOR RN)	AS ZCZB ,
+       NSR.SJJYDZ,
+       NSR.SCJYDLXDH, 
+       NSR.ZCDZ,
+       NSR.ZCDLXDH,
+       FB.JYFWZY,
+       (SELECT ML.MC_J FROM DB_ZGXT.T_DM_GY_HYZXL HY, DB_ZGXT.T_DM_GY_HYDL DL,DB_ZGXT.T_DM_GY_HYML ML  WHERE ML.HYML_DM=DL.HYML_DM AND HY.HYDL_DM=DL.HYDL_DM AND HY.HYZXL_DM=NSR.GBHY_DM)	AS HYML,
+       (SELECT DL.MC_J FROM DB_ZGXT.T_DM_GY_HYZXL HY , DB_ZGXT.T_DM_GY_HYDL DL  WHERE HY.HYDL_DM=DL.HYDL_DM AND HY.HYZXL_DM=NSR.GBHY_DM)	AS HYDL,      
+       (SELECT HY.MC_J FROM DB_ZGXT.T_DM_GY_HYZXL HY WHERE HY.HYZXL_DM=NSR.GBHY_DM)	AS GBHY, 
+       (SELECT LX.MC FROM DB_ZGXT.T_DM_GY_DJZCLX LX WHERE LX.DJZCLX_DM=NSR.DJZCLX_DM)||','||DECODE(FB.ZSFS_DM,'40','双定户','41','双定户','42','双定户','申报户')	AS ZCLX,      
+       (SELECT QX.MC FROM DB_ZGXT.T_DM_DJ_QYSDSZGQX QX WHERE QX.QYSDSZGQX_DM=FB.QYSDSZGQX_DM )	AS QYSDSZGQX,
+       (SELECT FS.MC FROM DB_ZGXT.T_DM_GY_ZSFS FS WHERE FS.ZSFS_DM=FB.ZSFS_DM )	AS QYSDSZSFS,      
+       (SELECT ZT.MC FROM DB_ZGXT.T_DM_GY_NSRZT ZT WHERE ZT.NSRZT_DM=LY.DJZT_DM)	AS NSRZT  ,
+       (SELECT JC.MC_J FROM DB_ZGXT.T_DM_GY_SWJG JC WHERE JC.SWJG_DM=NSR.JIANCJG_DM) AS JCJGMC,
+       (SELECT GL.MC_J FROM DB_ZGXT.T_DM_GY_SWJG GL WHERE GL.SWJG_DM=NSR.GLJG_DM) AS GLJGMC 
+	FROM db_zgxt.t_dj_jgnsr nsr,db_zgxt.t_dj_jgnsrfb fb,DB_ZGXT.T_DJ_DJLY LY 
+	WHERE nsr.swglm=fb.swglm AND NSR.SWGLM=LY.SWGLM
+  AND LY.DJLY_BJ='01'
+  and NSR.SWGLM=#{swglm,jdbcType=VARCHAR}
+	]]>
+	</select>
+	<!--
+		<select id="selectNsrJbqk" parameterType="string"
+		resultMap="nsrJbxxMap"> <![CDATA[ SELECT NSR.SWGLM , NSR.NSRSBM ,
+		NSR.NSR_MC, NSR.ZZJGTYDM, NSR.PZWH, NSR.ZZHM||'('||NSR.ZZLB_DM||')' AS
+		ZZHM, NSR.BZ_DM ||NSR.TZ_JE AS ZCZB, NSR.SJJYDZ, NSR.SCJYDLXDH,
+		NSR.ZCDZ, NSR.ZCDLXDH, NSR.JYFWZY, NSR.JYFWJY, NSR.GBHY_DM AS GBHY,
+		NSR.DJZCLX_DM||'('|| DECODE(NSR.SDH,'1','双定户','申报户')||')' AS ZCLX,
+		NSR.QYSDSZGQX_DM AS QYSDSZGQX, NSR.QYSDS_ZSFS_DM AS QYSDSZSFS,
+		NSR.GRSDS_ZSFS_DM AS GRSDSZSFS, NSR.NSRZT_DM AS NSRZT FROM NSR_JBXX
+		NSR WHERE NSR.SWGLM=#{swglm} ]]> </select>
+	-->
+	<!--
+		纳税人登记信息:第二分页信息 <resultMap type="NsrDjxxSecondVo"
+		id="nsrDjxxSecondPageMap" > <collection property="tzrxx"
+		ofType="Investor" column="swglm" select="selectNsrDjxxTZrxx"/>
+		<collection property="rzryxx" ofType="OfficeStaff" column="swglm"
+		select="selectNsrRzryxx"/> <collection property="yhzhxx"
+		ofType="BankAccount" column="swglm" select="selectNsrYhzhxx"/>
+		</resultMap> <select id="selectNsrDjxxSecond" parameterType="string"
+		resultMap="nsrDjxxSecondPageMap"> <![CDATA[ select #{swglm} as "swglm"
+		from dual ]]> </select>
+	-->
+	<!-- 投资人信息：-->
+	<resultMap type="Investor" id="nsrInvestor">
+		<!--
+			<id property="swglm" column="SWGLM" javaType="string"
+			jdbcType="BIGINT" />
+		-->
+		<result property="tzrxm" column="TZFMC" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="tzrid" column="TZRID" javaType="string"
+			jdbcType="VARCHAR" />		
+		<!--<result property="tzrtel" column="" javaType="string"
+			jdbcType="VARCHAR" /> 
+		<result property="tzbz" column="TZBZ"
+			javaType="string" jdbcType="VARCHAR" /> <result property="tzmoney"
+			column="TZJE" javaType="string" jdbcType="VARCHAR" />
+		-->
+		<result property="tzbl" column="TZBL" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectNsrDjxxTZrxx" parameterType="string"
+		resultMap="nsrInvestor">	
+	<![CDATA[
+	SELECT TZR.SWGLM, 
+           TZR.TZF_MC AS TZFMC,
+           TZR.ZJ_HM||'('||(SELECT MC FROM DB_ZGXT.T_DM_DJ_ZJLX ZJ WHERE ZJ.ZJLX_DM= TZR.ZJLX_DM)||')' AS TZRID,                   
+           TO_CHAR(TZR.TZ_BL,'FM990.909999') AS TZBL
+    FROM DB_ZGXT.T_DJ_GDTZXX TZR
+   	WHERE TZR.SWGLM=#{swglm,jdbcType=VARCHAR}
+   	ORDER BY TZBL DESC
+	]]>
+	</select>
+	<!--
+		<select id="selectNsrDjxxTZrxx" parameterType="string"
+		resultMap="nsrInvestor"> <![CDATA[ SELECT TZR.SWGLM, TZR.TZF_MC AS
+		TZFMC, TZR.ZJ_HM||'('||TZR.ZJLX_DM||')' AS TZRID, TZR.BZ_DM AS TZBZ,
+		TZR.TZ_JE AS TZJE, TZR.TZBL AS TZBL FROM NSR_GDTZXX TZR WHERE
+		TZR.SWGLM=#{swglm} ORDER BY TZBL DESC ]]> </select>
+	-->
+	<!-- 任职人员 -->
+	<resultMap type="OfficeStaff" id="nsrRzryxx">
+		<result property="xm" column="XM" javaType="string" jdbcType="VARCHAR" />
+		<result property="rzryid" column="ZJH" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zw" column="RYLX" javaType="string" jdbcType="VARCHAR" />
+		<result property="tel" column="LXDH" javaType="string"
+			jdbcType="VARCHAR" />
+			<result property="yddh" column="YDDH" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectNsrRzryxx" parameterType="string" resultMap="nsrRzryxx">	
+	<![CDATA[
+		SELECT RY.SWGLM, 
+           RY.XM,
+           RY.ZJH||'('||ZJ.MC||')' AS ZJH, 
+           LX.MC RYLX,          
+           RY.GDDH LXDH,
+            RY.YD_DH YDDH
+    	FROM DB_ZGXT.T_DJ_RYQKB RY,DB_ZGXT.T_DM_DJ_RYLX LX,DB_ZGXT.T_DM_DJ_ZJLX ZJ,DB_ZGXT.T_DM_DJ_RYLX  RL
+    	WHERE RY.RYLX_DM=LX.RYLX_DM 
+    	AND RY.ZJLX_DM=ZJ.ZJLX_DM 
+      	AND RL.RYLX_DM=RY.RYLX_DM  
+    	AND RY.SWGLM=#{swglm,jdbcType=VARCHAR}
+    	ORDER BY RY.RYLX_DM
+	]]>
+	</select>
+	<!--
+		<select id="selectNsrRzryxx" parameterType="string"
+		resultMap="nsrRzryxx"> <![CDATA[ SELECT RY.SWGLM, RY.XM,
+		RY.ZJH||'('||RY.ZJLX_DM||')' AS ZJH, RY.ZW_DM, RY.ZW_DM AS ZW, RY.LXDH
+		FROM NSR_RZRY RY WHERE RY.SWGLM=#{swglm} ORDER BY ZW_DM ]]> </select>
+	-->
+
+
+	<!-- 银行账号  -->
+	<resultMap type="BankAccount" id="nsrYhzhxx">
+		<result property="khyh" column="YH" javaType="string" jdbcType="VARCHAR" />
+		<result property="yhzh" column="ZH" javaType="string" jdbcType="VARCHAR" />
+		<result property="nszh" column="ZHLB" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectNsrYhzhxx" parameterType="string" resultMap="nsrYhzhxx">	
+	<![CDATA[
+    SELECT YH.SWGLM,
+      YH.YX_QSRQ, 
+      YH.YX_ZZRQ,
+        (SELECT HB.MC FROM DB_ZGXT.T_DM_GY_YH HB WHERE HB.YH_DM=YH.YH_DM AND HB.YHHB_DM=YH.YHHB_DM )  AS YH,
+         YH.YH_ZH AS ZH,
+        LB.MC AS ZHLB ,
+         YH.SB_DM
+    FROM DB_ZGXT.T_DJ_NSRYHZH YH JOIN  DB_ZGXT.T_DM_GY_YHZHLB LB ON LB.YHZHLB_DM=YH.YHZHLB_DM
+    WHERE  SH_BJ=1 AND YH.YX_QSRQ<SYSDATE AND (YH.YX_ZZRQ>SYSDATE OR YX_ZZRQ IS NULL ) 
+    AND YH.SWGLM=#{swglm,jdbcType=VARCHAR}
+    ORDER BY LB.YHZHLB_DM    
+	]]>
+	</select>
+	<!--
+		<select id="selectNsrYhzhxx" parameterType="string"
+		resultMap="nsrYhzhxx"> <![CDATA[ SELECT YH.SWGLM, YH.YH_DM AS YH,
+		YH.YH_ZH AS ZH, YH.YHZHLB_DM AS ZHLB FROM NSR_YHZH YH WHERE
+		YH.SWGLM=#{swglm} ORDER BY ZHLB ]]> </select>
+	-->
+
+	<!-- 房产登记信息 -->
+	<resultMap type="HouseEstate" id="fcdjxx">
+		<result property="fczh" column="CQZSH" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="fczld" column="FWZL" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="jzmj" column="FWJZMJ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="fcyz" column="FCYZ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="iszyfc" column="SFZY" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zq" column="FCZQ" javaType="string" jdbcType="VARCHAR" />
+		<result property="nzj" column="CZ_NZJ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="chuzfxxv" column="CZF" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="chengzfxxv" column="CHENGZF" javaType="string"
+			jdbcType="VARCHAR" />		
+	</resultMap>
+	<select id="selectNsrFcdj" parameterType="string" resultMap="fcdjxx">	
+	<![CDATA[
+ SELECT  ZY.CQZSH AS CQZSH,
+   		ZY.FWZL AS FWZL,
+        ZY.FWJZMJ AS FWJZMJ,
+        '自用房产' AS SFZY,
+        ZY.YSFCYZJE AS FCYZ,
+        TO_CHAR(ZY.NSYWQSSJ,'YYYY-MM-DD')||' 至 '||TO_CHAR(ZY.NSYWZZSJ,'YYYY-MM-DD') AS FCZQ, 
+        ZY.ZYFCNYNSE AS CZ_NZJ,
+        NULL AS CZF,     
+        NULL AS CHENGZF        
+FROM DB_ZGXT.T_DJ_FCSSY_ZYFW ZY,DB_ZGXT.T_DJ_SYCJQKB DJ
+WHERE ZY.PZ_XH=DJ.PZ_XH AND (ZY.ZFBJ<>1 OR ZY.ZFBJ IS  NULL) AND  DJ.SWGLM=#{swglm}
+UNION ALL
+SELECT CZ.CQZSH AS CQZSH,
+       CZ.FWZL AS FWZL,
+       CZ.ZFMJ AS FWJZMJ,
+       '出租房产' AS SFZY,
+       CZ.CZFCYZ AS FCYZ,
+       TO_CHAR(CZ.HTQSSJ,'YYYY-MM-DD')||' 至 '||TO_CHAR(CZ.HTZZSJ,'YYYY-MM-DD') AS FCZQ, 
+       CZ.HJJE AS CZ_NZJ,
+       NULL AS CZF,     
+       CZ.CZRMC||'('||NVL((SELECT LX.MC_J FROM DB_ZGXT.T_DM_DJ_ZJLX LX WHERE LX.ZJLX_DM=CZ.CZRZJMC),CZ.CZRZJMC)||' '||CZ.CZRZJHM||')' AS CHENGZF        
+FROM DB_ZGXT.T_DJ_FCSSY_CZFW CZ,DB_ZGXT.T_DJ_SYCJQKB DJ
+WHERE CZ.PZ_XH=DJ.PZ_XH AND (CZ.ZFBJ<>1 OR CZ.ZFBJ IS  NULL) AND  DJ.SWGLM=#{swglm,jdbcType=VARCHAR}
+UNION ALL
+SELECT NULL AS CQZSH,
+       CH.CZFWZL AS FWZL,
+       CH.CZMJ AS FWJZMJ,
+       '承租房产' AS SFZY,
+       CH.CZYSFCYZ AS FCYZ,
+       TO_CHAR(CH.HTQSSJ,'YYYY-MM-DD')||' 至 '||TO_CHAR(CH.HTZZSJ,'YYYY-MM-DD') AS FCZQ, 
+       CH.HTYDNJZ AS CZ_NZJ,
+       CH.CZRMC||'('||NVL((SELECT LX.MC_J FROM DB_ZGXT.T_DM_DJ_ZJLX LX WHERE LX.ZJLX_DM=CH.CZRZJMC),CH.CZRZJMC)||' '||CH.CZRZJHM||')' AS CZF,     
+       NULL AS CHENGZF        
+FROM DB_ZGXT.T_DJ_FCSSY_CZFWW CH,DB_ZGXT.T_DJ_SYCJQKB DJ
+WHERE CH.PZ_XH=DJ.PZ_XH AND (CH.ZFBJ<>1 OR CH.ZFBJ IS  NULL) AND  DJ.SWGLM=#{swglm,jdbcType=VARCHAR}
+ORDER BY SFZY DESC,FWZL
+	]]>
+	</select>
+
+	<!-- 土地登记信息 -->
+	<resultMap type="LandedEstate" id="tddjxx">
+		<result property="landid" column="CQZSH" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="landdz" column="TDZL" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="mj" column="TDMJ" javaType="string" jdbcType="VARCHAR" />
+		<result property="dj" column="TDDJ" javaType="string" jdbcType="VARCHAR" />
+		<result property="tdlx" column="SFZY" javaType="string" jdbcType="VARCHAR" />
+		<result property="nsqx" column="NSQX" javaType="string" jdbcType="VARCHAR" />
+		<result property="ysmj" column="YSMJ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="mpfse" column="MPFMSE" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="nynse" column="NYNSE" javaType="string"
+			jdbcType="VARCHAR" />	
+	</resultMap>
+	<select id="selectNsrTddj" parameterType="string" resultMap="tddjxx">	
+	<![CDATA[
+SELECT  ZY.TDZSH AS CQZSH,
+   		ZY.TDZL AS TDZL,
+        ZY.TDMJ AS TDMJ,
+        ZY.DDDJ AS TDDJ,
+        '自用土地' AS SFZY,     
+        TO_CHAR(ZY.NSYWQSSJ,'YYYY-MM-DD')||' 至 '||TO_CHAR(ZY.NSYWZZSJ,'YYYY-MM-DD') AS NSQX, 
+        ZY.YSMJ AS YSMJ,
+        ZY.MPFMSE AS MPFMSE, 
+        ZY.ZYTDNYNSE AS NYNSE
+FROM DB_ZGXT.T_DJ_TDSYSSY_ZYTD ZY,DB_ZGXT.T_DJ_SYCJQKB DJ
+WHERE ZY.PZ_XH=DJ.PZ_XH AND (ZY.ZFBJ<>1 OR ZY.ZFBJ IS  NULL) AND  DJ.SWGLM=#{swglm}
+UNION ALL
+SELECT  CZ.TDZSH AS CQZSH,
+   		CZ.TDZL AS TDZL,
+        CZ.TDMJ AS TDMJ,
+        CZ.DDDJ AS TDDJ,
+        '出租土地' AS SFZY,     
+        TO_CHAR(CZ.NSYWQSSJ,'YYYY-MM-DD')||' 至 '||TO_CHAR(CZ.NSYWZZSJ,'YYYY-MM-DD') AS NSQX ,
+        CZ.YSMJ AS YSMJ,
+        CZ.MPFMSE AS MPFMSE, 
+        CZ.ZYTDNYNSE AS NYNSE
+FROM DB_ZGXT.T_DJ_TDSYSSY_CZTD CZ,DB_ZGXT.T_DJ_SYCJQKB DJ
+WHERE CZ.PZ_XH=DJ.PZ_XH AND (CZ.ZFBJ<>1 OR CZ.ZFBJ IS  NULL) AND  DJ.SWGLM=#{swglm}
+UNION ALL
+SELECT  NULL AS CQZSH,
+   		CH.FWZL AS TDZL,
+        CH.CZMJ AS TDMJ,
+        CH.DDDJ AS TDDJ,
+        '承租土地' AS SFZY,     
+        TO_CHAR(CH.HTQSSJ,'YYYY-MM-DD')||' 至 '||TO_CHAR(CH.HTZZSJ,'YYYY-MM-DD') AS NSQX ,
+        CH.YSMJ AS YSMJ,
+        CH.MFFMSE AS MPFMSE, 
+        CH.NYNSE AS NYNSE
+FROM DB_ZGXT.T_DJ_TDSYSSY_CZTDC CH,DB_ZGXT.T_DJ_SYCJQKB DJ
+WHERE CH.PZ_XH=DJ.PZ_XH AND (CH.ZFBJ<>1 OR CH.ZFBJ IS  NULL) AND  DJ.SWGLM=#{swglm,jdbcType=VARCHAR}
+ORDER BY SFZY DESC,TDZL
+	]]>
+	</select>
+
+
+	<!--登记变更 -->
+	<resultMap type="ChangeRecord" id="djbgjl">
+		<result property="bgxm" column="BGXM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="bgqnr" column="BGQNR" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="bghnr" column="BGHNR" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="bgsj" column="BGSJ" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectNsrDjbg" parameterType="string" resultMap="djbgjl">	
+	<![CDATA[
+	SELECT  BG.PROPERTY_NAME AS BGXM,
+  			BG.BGQ_VALUE AS BGQNR,
+  			BG.BGH_VALUE AS BGHNR, 
+  			TO_CHAR(BG.LR_SJ,'yyyy-MM-dd') AS BGSJ
+	FROM DB_ZGXT.T_JH_FW_WLFW_DJ_BGXXDB BG
+	WHERE BG.SWGLM=#{swglm,jdbcType=VARCHAR}
+	ORDER BY BGSJ DESC
+	]]>
+	</select>
+
+	<!--
+		<select id="selectNsrDjbg" parameterType="string" resultMap="djbgjl">
+		<![CDATA[ SELECT BG.BGXM, BG.BGQNR, BG.BGHNR,
+		TO_CHAR(BG.BGSJ,'yyyy-MM-dd') FROM NSR_DJBGXX BG WHERE
+		BG.SWGLM=#{swglm} ORDER BY BGSJ DESC ]]> </select>
+	-->
+
+	<!-- 登记来源 -->
+	<resultMap type="RegisteSource" id="djlyxx">
+		<result property="djlydm" column="DJLYDM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="djly" column="DJLY" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="djzt" column="DJZT" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectNsrDjly" parameterType="string" resultMap="djlyxx">	
+	<![CDATA[
+		SELECT  LY.DJLY_BJ AS DJLYDM,
+				(SELECT LYDM.DJLY_MC FROM DB_ZGXT.T_DM_DJ_DJLY LYDM WHERE LYDM.DJLY_DM=LY.DJLY_BJ ) AS DJLY,
+				(SELECT ZTDM.MC FROM DB_ZGXT.T_DM_GY_NSRZT ZTDM WHERE ZTDM.NSRZT_DM=LY.DJZT_DM) AS DJZT
+		FROM DB_ZGXT.T_DJ_DJLY LY
+		WHERE  LY.SWGLM=#{swglm,jdbcType=VARCHAR}   
+		ORDER BY DJLYDM
+		]]>
+	</select>
+	<!--
+		<select id="selectNsrDjly" parameterType="string" resultMap="djlyxx">
+		<![CDATA[ SELECT LY.DJLY_BJ AS DJLYDM, LY.DJLY_BJ AS DJLY, LY.DJZT_DM
+		AS DJZT FROM NSR_DJLY LY WHERE LY.SWGLM=#{swglm} ORDER BY DJLYDM ]]>
+		</select>
+	-->
+
+	<!-- 纳税人状态：非正常户认定 -->
+	<resultMap type="StatusRecord" id="nsrztxx">
+		<result property="fzchrdsj" column="RDRQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="rdry" column="RDRY" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="fzchjcsj" column="JCRQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="jcry" column="JCRY" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectNsrZt" parameterType="string" resultMap="nsrztxx">
+	<![CDATA[
+	SELECT ZT.RD_SJ AS RDRQ,
+       NVL((SELECT RY.MC FROM DB_ZGXT.T_DM_GY_SWRY RY WHERE RY.SWRY_DM=ZT.LRR_DM),ZT.LRR_DM)  AS RDRY,
+       ZT.JC_RQ AS JCRQ,
+       (SELECT RY.MC FROM DB_ZGXT.T_DM_GY_SWRY RY WHERE RY.SWRY_DM=ZT.XGR_DM) AS JCRY
+	FROM DB_ZGXT.SXGL_RD_FZCHRD ZT
+	WHERE ZT.SWGLM=#{swglm}
+  	ORDER BY RDRQ DESC
+	]]>
+	</select>
+	<!--
+		<select id="selectNsrZt" parameterType="string" resultMap="nsrztxx">
+		<![CDATA[ SELECT ZT.RD_RQ AS RDRQ, (SELECT RY.MC||'('||RY.SWRY_DM||')'
+		FROM SWRY RY WHERE RY.SWRY_DM=ZT.RDRY ) AS RDRY, ZT.JC_RQ AS JCRQ,
+		(SELECT RY.MC||'('||RY.SWRY_DM||')' FROM SWRY RY WHERE
+		RY.SWRY_DM=ZT.JCRY ) AS JCRY FROM NSR_ZTXX ZT WHERE ZT.SWGLM=#{swglm}
+		]]> </select>
+	-->
+	<!-- 鉴定核定信息 -->
+	<resultMap type="JdhdxxVo" id="jdhdxxMap">
+		<result property="jdly" column="JDLY" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zsxm" column="ZSXM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zspm" column="ZSPM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="jdyxq" column="JDYXQ" javaType="string"
+			jdbcType="VARCHAR" />		
+		<result property="jsje" column="JSJE" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="jdlx" column="JDLX" javaType="string"
+			jdbcType="VARCHAR" />
+			<result property="sbqx" column="SBQXR" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectNsrZsfs" parameterType="string" resultType="int">	
+	SELECT FB.ZSFS_DM FROM DB_ZGXT.T_DJ_JGNSRFB FB  WHERE FB.SWGLM=#{swglm,jdbcType=VARCHAR}	
+	</select>
+	<select id="selectHdxx" parameterType="string" resultMap="jdhdxxMap">	
+	<![CDATA[
+	SELECT B.ZSXM,B.ZSPM,B.JDLY,B.JDYXQ,B.JSJE,B.SBQXR,B.JDLX
+	FROM(
+      SELECT (SELECT XM.MC FROM DB_ZGXT.T_DM_GY_ZSXM XM WHERE XM.ZSXM_DM=A.ZSXM) ZSXM,
+             (SELECT PM.MC FROM DB_ZGXT.T_DM_GY_ZSPM PM WHERE PM.ZSPM_DM=A.ZSPM AND PM.ZSXM_DM=A.ZSXM) ZSPM,
+             (SELECT LY.JDLY_MC FROM DB_ZGXT.T_DM_RD_JDLYDMB LY WHERE LY.JDLY_DM=A.JDLY) JDLY,
+              A.JDYXQ,
+              A.JSJE,
+              A.JDLX,
+              (SELECT T.MC_J FROM DB_ZGXT.T_DM_GY_NSQXR T WHERE T.NSQXR_DM=A.SBQXR AND T.ZSXM_DM=A.ZSXM) SBQXR,
+              ROWNUM RN
+    	 FROM(
+            SELECT HD.ZSXM_DM AS ZSXM,
+                  HD.ZSPM_DM AS ZSPM,
+                  HD.JDLY_DM AS JDLY,
+                  HD.HD_QSRQ AS QSRQ,
+                  HD.HD_ZZRQ AS ZZRQ, 
+                  TO_CHAR(HD.HD_QSRQ,'yyyy-MM-dd')||'至' ||TO_CHAR(HD.HD_ZZRQ,'yyyy-MM-dd') AS JDYXQ, 
+                  HD.JS_JE  AS JSJE ,
+                  HD.SBQXR_DM SBQXR,
+                  '0'  AS JDLX
+             FROM DB_ZGXT.T_DJ_JGNSRFB FB LEFT JOIN  DB_ZGXT.T_HD_SDJDXXB HD ON FB.SWGLM=HD.SWGLM 
+             WHERE  HD.HD_ZZRQ>SYSDATE             
+             AND  FB.SWGLM=#{swglm,jdbcType=VARCHAR}                        
+             ORDER BY ZSXM,ZSPM,JDLY,JDYXQ DESC
+            )A   
+    	  WHERE ROWNUM<#{endNum}   	
+    	  )B
+	WHERE B.RN>#{startNum}
+	]]>
+	</select>
+	<select id="selectJdxx" parameterType="string" resultMap="jdhdxxMap">	
+	<![CDATA[
+	SELECT B.ZSXM,B.ZSPM,B.JDLY,B.JDYXQ,B.SBQXR,B.JDLX
+	FROM(
+      SELECT (SELECT XM.MC FROM DB_ZGXT.T_DM_GY_ZSXM XM WHERE XM.ZSXM_DM=A.ZSXM) ZSXM,
+             (SELECT PM.MC FROM DB_ZGXT.T_DM_GY_ZSPM PM WHERE PM.ZSPM_DM=A.ZSPM AND PM.ZSXM_DM=A.ZSXM) ZSPM,
+             (SELECT LY.JDLY_MC FROM DB_ZGXT.T_DM_RD_JDLYDMB LY WHERE LY.JDLY_DM=A.JDLY) JDLY,
+              A.JDYXQ, 
+              A.JDLX,
+              (SELECT T.MC_J FROM DB_ZGXT.T_DM_GY_NSQXR T WHERE T.NSQXR_DM=A.SBQXR AND T.ZSXM_DM=A.ZSXM) SBQXR,
+              ROWNUM RN
+    	 FROM(
+            SELECT JD.ZSXM_DM AS ZSXM,
+                  JD.ZSPM_DM AS ZSPM,
+                  JD.JDLY_DM AS JDLY,
+                  JD.HD_QSRQ AS QSRQ,
+                  JD.HD_ZZRQ AS ZZRQ, 
+                  TO_CHAR(JD.HD_QSRQ,'yyyy-MM-dd')||'至' ||TO_CHAR(JD.HD_ZZRQ,'yyyy-MM-dd') AS JDYXQ,
+                  JD.SBQXR_DM AS SBQXR,
+                  '1'  AS  JDLX
+             FROM DB_ZGXT.T_DJ_JGNSRFB FB  JOIN  DB_ZGXT.T_RD_SZJDXX  JD ON JD.SWGLM=FB.SWGLM
+             WHERE JD.HD_ZZRQ>SYSDATE AND  FB.SWGLM=#{swglm,jdbcType=VARCHAR}              
+             ORDER BY ZSXM,ZSPM,JDLY,JDYXQ DESC
+            )A   
+    	  WHERE ROWNUM<#{endNum} 	
+    	  )B
+	WHERE B.RN>#{startNum}
+	]]>
+	</select>
+	<!-- 
+	<select id="selectJdhdxx" parameterType="string" resultMap="jdhdxxMap">	
+	<![CDATA[
+	SELECT B.ZSXM,B.ZSPM,B.JDLY,B.JDYXQ,B.JSJE
+	FROM
+    	(SELECT (SELECT XM.MC FROM DB_ZGXT.T_DM_GY_ZSXM XM WHERE XM.ZSXM_DM=A.ZSXM) ZSXM,
+              (SELECT PM.MC FROM DB_ZGXT.T_DM_GY_ZSPM PM WHERE PM.ZSPM_DM=A.ZSPM AND PM.ZSXM_DM=A.ZSXM) ZSPM,
+              (SELECT LY.JDLY_MC FROM DB_ZGXT.T_DM_RD_JDLYDMB LY WHERE LY.JDLY_DM=A.JDLY) JDLY,
+              A.JDYXQ,
+              A.JSJE,
+              ROWNUM RN
+    	 FROM  
+    	 	(SELECT V.ZSXM AS ZSXM,
+              		V.ZSPM AS ZSPM,
+              		MAX(V.JDLY) JDLY,
+              		TO_CHAR(V.QSRQ,'yyyy-MM-dd')||'至' ||TO_CHAR(V.ZZRQ,'yyyy-MM-dd') AS JDYXQ,              		
+              		MAX(V.JSJE)   AS JSJE
+          	 FROM (
+                SELECT DECODE(FB.ZSFS_DM,'40',HD.ZSXM_DM,'41',HD.ZSXM_DM,'42',HD.ZSXM_DM,JD.ZSXM_DM) AS ZSXM,
+                       DECODE(FB.ZSFS_DM,'40',HD.ZSPM_DM,'41',HD.ZSPM_DM,'42',HD.ZSPM_DM,JD.ZSPM_DM) AS ZSPM,
+                       DECODE(FB.ZSFS_DM,'40',HD.JDLY_DM,'41',HD.JDLY_DM,'42',HD.JDLY_DM,JD.JDLY_DM) AS JDLY,
+                       DECODE(FB.ZSFS_DM,'40',HD.HD_QSRQ,'41',HD.HD_QSRQ,'42',HD.HD_QSRQ,JD.HD_QSRQ) QSRQ,
+                       DECODE(FB.ZSFS_DM,'40',HD.HD_ZZRQ,'41',HD.HD_ZZRQ,'42',HD.HD_ZZRQ,JD.HD_ZZRQ) ZZRQ,             		
+                       DECODE(FB.ZSFS_DM,'40',HD.YNSE,'41',HD.YNSE,'42',HD.YNSE,NULL)   AS JSJE 
+                FROM DB_ZGXT.T_DJ_JGNSRFB FB LEFT JOIN  DB_ZGXT.T_HD_SDJDXXB HD ON FB.SWGLM=HD.SWGLM LEFT JOIN DB_ZGXT.T_RD_SZJDXX  JD ON JD.SWGLM=FB.SWGLM
+                WHERE FB.SWGLM=#{swglm,jdbcType=VARCHAR} 
+             )V 
+             GROUP BY ZSXM,ZSPM,QSRQ,ZZRQ
+             ORDER BY JDYXQ DESC,JDLY,ZSXM,ZSPM  
+            )A   
+    	  WHERE ROWNUM<#{endNum}    	
+    	  )B
+	WHERE B.RN>#{startNum}
+	]]>
+	</select>
+ -->
+	<!--
+		<select id="selectJdhdxx" parameterType="string"
+		resultMap="jdhdxxMap"> <![CDATA[ SELECT
+		B.ZSXM,B.ZSPM,B.JDLY,B.JDYXQ,B.JSJE FROM (SELECT
+		A.ZSXM,A.ZSPM,A.JDLY,A.JDYXQ,A.JSJE,ROWNUM RN FROM (SELECT JD.ZSXM||'
+		'||JD.ZSXM AS ZSXM, JD.ZSPM||' '|| JD.ZSPM AS ZSPM, JD.JDLY,
+		TO_CHAR(JD.JD_QSRQ,'yyyy-MM-dd')||'至'
+		||TO_CHAR(JD.JD_ZZRQ,'yyyy-MM-dd') AS JDYXQ, JD.JS_JE AS JSJE FROM
+		NSR_JDXX JD WHERE JD.SWGLM=#{swglm} ORDER BY JDLY,ZSXM,ZSPM )A WHERE
+		ROWNUM<#{endNum} )B WHERE B.RN>#{startNum} ]]> </select>
+	-->
+
+	<!-- 申报信息 -->
+	<resultMap type="SbxxVo" id="sbxxMap">
+		<result property="sbrq" column="SBRQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zsxm" column="ZSXM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zspm" column="ZSPM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="sfssq" column="SFSSQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="yzsfje" column="YZJE" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="jkqx" column="JKQX" javaType="string"
+			jdbcType="VARCHAR" />
+		<!--
+			<result property="rkrq" column="RKRQ" javaType="string"
+			jdbcType="VARCHAR" /> <result property="jkrq" column="JKRQ"
+			javaType="string" jdbcType="VARCHAR" />
+		-->
+	</resultMap>
+	<select id="selectSbxx" parameterType="map" resultMap="sbxxMap">	
+	<![CDATA[
+	SELECT B.SWGLM,B.SBRQ,B.ZSXM,B.ZSPM,B.SFSSQ,B.YZJE,B.JKQX
+	 FROM
+    	(SELECT A.SWGLM,
+              A.ZSXM ||' '||(select MC from db_zgxt.T_DM_GY_ZSXM v where v.ZSXM_DM=A.ZSXM) AS ZSXM,
+              A.ZSPM ||' '||(select MC from db_zgxt.T_DM_GY_ZSPM v where v.ZSXM_DM=A.ZSXM and v.ZSPM_DM=A.ZSPM) AS ZSPM,
+              TO_CHAR(A.SFSSQ_QSRQ,'yyyy-MM-dd')||'至'||TO_CHAR(A.SFSSQ_ZZRQ,'yyyy-MM-dd') AS SFSSQ,             
+              TO_CHAR(A.SB_RQ,'yyyy-MM-dd') AS SBRQ,
+              A.YZJE,
+              TO_CHAR(A.JK_QX,'yyyy-MM-dd') AS JKQX,              
+              ROWNUM RN
+    	 FROM  
+    	 	(
+        SELECT SB.SWGLM,
+               SB.ZSXM_DM AS ZSXM,
+               SB.ZSPM_DM AS ZSPM,
+               SB.SFSSQ_QSRQ,
+               SB.SFSSQ_ZZRQ,
+               SB.SB_RQ,       
+               SB.YZSF_JE AS YZJE, 
+               SB.JK_QX 
+        FROM DB_ZGXT.T_ZS_YZMX SB
+        WHERE TZLX_DM='00' AND ZF_BJ=0 
+        AND (FPBS is null or FPBS<3)
+        ]]>
+		<if test="startDate!=null">
+        <![CDATA[
+        AND SB.SB_RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+        ]]>
+		</if>
+		<if test="endDate!=null">	 		
+	 	<![CDATA[ 
+        AND SB.SB_RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+        ]]>
+		</if>  
+		<if test="zsxmDm!=null">	 		
+	 		<![CDATA[ 
+        		 AND ZSXM_DM= #{zsxmDm,jdbcType=VARCHAR}
+        	]]>
+        	<if test="zspmDm!=null">	 		
+	 			<![CDATA[ 
+         			AND ZSPM_DM=#{zspmDm,jdbcType=VARCHAR} 
+        		]]>
+			</if> 
+		</if>           
+	 	<![CDATA[ 
+	 	AND SB.SWGLM=#{swglm,jdbcType=VARCHAR}	 	
+        ORDER BY TRUNC(SB_RQ) DESC,ZSXM,ZSPM        
+    		 )A
+    	 WHERE ROWNUM<#{endNum})B
+	 WHERE B.RN>#{startNum}
+	]]>
+	</select>
+<!-- 20140520 11:26  申报信息查询：客户端汇总页面信息 -->
+	<select id="selectSbxxMain" parameterType="map" resultType="map">	
+	<![CDATA[
+	SELECT (select MC from db_zgxt.T_DM_GY_ZSXM v where v.ZSXM_DM=SB.ZSXM_DM)  AS "zsxmMc",
+       	   (select MC from db_zgxt.T_DM_GY_ZSPM v where v.ZSXM_DM=SB.ZSXM_DM and v.ZSPM_DM=SB.ZSPM_DM)  AS "zspmMc",
+       		SB.ZSXM_DM AS "zsxmDm", 
+       		SB.ZSPM_DM AS "zspmDm",
+       		TO_CHAR(SUM(SB.YZSF_JE),'FM999999999990.90') AS "sbje"       		 
+	FROM DB_ZGXT.T_ZS_YZMX SB
+	WHERE TZLX_DM='00' AND ZF_BJ=0 
+	AND (FPBS is null or FPBS<3) 
+	 ]]> 
+	 <if test="startDate!=null">
+	 <![CDATA[
+	 AND SB.SB_RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')  
+	 ]]> 
+	 </if>  	  
+	 <if test="endDate!=null">
+	 <![CDATA[
+	 AND SB.SB_RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')   
+	 ]]> 
+	 </if>  
+	<![CDATA[    
+	AND SB.SWGLM=#{swglm,jdbcType=VARCHAR}
+	GROUP BY ZSXM_DM,ZSPM_DM
+	ORDER BY ZSXM_DM,ZSPM_DM
+	]]>
+	</select>
+	
+	
+	
+	<select id="selectSbZje" parameterType="map" resultType="double">	
+	<![CDATA[
+ 		SELECT NVL(SUM(SB.YZSF_JE),0)  AS YZJE
+        FROM DB_ZGXT.T_ZS_YZMX SB       
+        WHERE TZLX_DM='00' AND ZF_BJ=0 
+        AND (FPBS is null or FPBS<2)
+        ]]>
+		<if test="startDate!=null">
+        <![CDATA[
+        AND SB.SB_RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+        ]]>
+		</if>
+		<if test="endDate!=null">	 		
+	 	<![CDATA[ 
+        AND SB.SB_RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+        ]]>
+		</if>       
+	 	<![CDATA[ 
+	 	AND SB.SWGLM=#{swglm}
+	 	]]>
+	</select>
+
+	<!--
+		<select id="selectSbZje" parameterType="map" resultType="double">
+		<![CDATA[ SELECT NVL(SUM(SB.YZSF_JE),0) AS ZYZJE FROM NSR_SBXX SB ]]>
+		<where> <if test="startDate!=null"> <![CDATA[
+		SB.SFSSQ_QSRQ>=TO_DATE(#{startDate},'yyyy-MM-dd') ]]> </if> <if
+		test="endDate!=null"> <![CDATA[ AND
+		SB.SFSSQ_ZZRQ<=TO_DATE(#{endDate},'yyyy-MM-dd') ]]> </if> <if
+		test="swglm!=null"> <![CDATA[ AND SB.SWGLM=#{swglm} ]]> </if> </where>
+		</select>
+	-->
+
+
+
+	<!-- 入库信息 -->
+	<resultMap type="RkxxVo" id="rkxxMap">
+		<result property="sbrq" column="SBRQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zsxm" column="ZSXM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zspm" column="ZSPM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="sfssq" column="SFSSQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="rkje" column="RKJE" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="jkqx" column="JKQX" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="rkrq" column="RKRQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="kjrq" column="JKRQ" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectRkxx" parameterType="map" resultMap="rkxxMap">	
+	<![CDATA[
+SELECT B.SWGLM,B.SBRQ,B.ZSXM,B.ZSPM,B.SFSSQ,B.RKJE,B.JKQX,B.RKRQ,B.JKRQ
+FROM
+	(SELECT A.SWGLM,          
+          A.ZSXM ||' '||(select MC from db_zgxt.T_DM_GY_ZSXM v where v.ZSXM_DM=A.ZSXM) AS ZSXM,
+          A.ZSPM ||' '||(select MC from db_zgxt.T_DM_GY_ZSPM v where v.ZSXM_DM=A.ZSXM and v.ZSPM_DM=A.ZSPM) AS ZSPM,         
+          TO_CHAR(A.SFSSQ_QSRQ,'yyyy-MM-dd')||'至'||TO_CHAR(A.SFSSQ_ZZRQ,'yyyy-MM-dd') AS SFSSQ,
+          TO_CHAR(A.RK_RQ,'yyyy-MM-dd') AS RKRQ ,
+          TO_CHAR(A.SB_RQ,'yyyy-MM-dd') AS SBRQ,
+          A.RKJE,
+          TO_CHAR(A.JK_QX,'yyyy-MM-dd') AS JKQX,
+          TO_CHAR(A.KJ_RQ,'yyyy-MM-dd') AS JKRQ,
+          ROWNUM RN
+   FROM  
+    	(SELECT RK.SWGLM,
+              RK.ZSXM_DM AS ZSXM,
+              RK.ZSPM_DM AS ZSPM,
+              RK.SFSSQ_QSRQ, 
+              RK.SFSSQ_ZZRQ,    				   
+              RK.SB_RQ,
+              RK.SJ_JE AS RKJE, 
+              RK.JK_QX,
+              RK.KJ_RQ,
+              RK.RK_RQ       				
+       FROM DB_ZGXT.T_ZS_JKMX RK 
+       WHERE TZLX_DM='00' and RK_RQ is not null and ZF_BJ=0 and PZ_XH is not null 
+        ]]>
+		<if test="startDate!=null">
+       <![CDATA[
+       AND RK.RK_RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+       ]]>
+		</if>
+		<if test="endDate!=null">
+       <![CDATA[
+       AND RK.RK_RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+      ]]>
+		</if>		
+	 <if test="zsxmDm!=null">	 		
+	 		<![CDATA[ 
+        		 AND ZSXM_DM= #{zsxmDm,jdbcType=VARCHAR}
+        	]]>
+        	<if test="zspmDm!=null">	 		
+	 			<![CDATA[ 
+         			AND ZSPM_DM=#{zspmDm,jdbcType=VARCHAR} 
+        		]]>
+			</if> 
+		</if>  
+      <![CDATA[ 
+       AND RK.SWGLM=#{swglm}	 		 
+       ORDER BY TRUNC(SB_RQ) DESC,ZSXM,ZSPM 
+    	)A
+  WHERE ROWNUM<#{endNum})B
+WHERE B.RN>#{startNum}
+	]]>
+	</select>
+	<!-- 20140520 16:01  入库信息查询：客户端汇总页面信息 -->
+	<select id="selectRkxxMain" parameterType="map" resultType="map">	
+	<![CDATA[
+	SELECT (select MC from db_zgxt.T_DM_GY_ZSXM v where v.ZSXM_DM=RK.ZSXM_DM) AS "zsxmMc",
+       	   (select MC from db_zgxt.T_DM_GY_ZSPM v where v.ZSXM_DM=RK.ZSXM_DM and v.ZSPM_DM=RK.ZSPM_DM)  AS "zspmMc",
+      	    RK.ZSXM_DM AS "zsxmDm", 
+       		RK.ZSPM_DM AS "zspmDm",
+       		TO_CHAR(SUM(RK.SJ_JE),'FM999999999990.90')  AS "rkje"
+	FROM DB_ZGXT.T_ZS_JKMX RK
+	WHERE TZLX_DM='00' and RK_RQ is not null and ZF_BJ=0 and PZ_XH is not null  
+	]]> 
+	 <if test="startDate!=null">
+	 <![CDATA[
+	 AND RK.RK_RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')  
+	 ]]> 
+	 </if>  	  
+	 <if test="endDate!=null">
+	 <![CDATA[
+	 AND RK.RK_RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')   
+	 ]]> 
+	 </if>  	
+	<![CDATA[ 	       
+	AND RK.SWGLM=#{swglm}
+	GROUP BY ZSXM_DM,ZSPM_DM
+	ORDER BY ZSXM_DM,ZSPM_DM
+	]]>
+	</select>
+	
+	
+	<select id="selectRkzje" parameterType="map" resultType="double">
+ 	<![CDATA[ 
+	SELECT NVL(SUM(RK.SJ_JE),0)  AS RKZJE
+	FROM DB_ZGXT.T_ZS_JKMX RK 
+	WHERE TZLX_DM='00' and RK_RQ is not null and ZF_BJ=0 and PZ_XH is not null 
+	]]>
+	<if test="endDate!=null">
+	<![CDATA[
+	AND RK.RK_RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	]]>
+		</if>
+		<if test="endDate!=null">
+	<![CDATA[
+	AND RK.RK_RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	]]>
+		</if>
+	<![CDATA[
+	AND RK.SWGLM=#{swglm,jdbcType=VARCHAR}
+	]]>
+	</select>
+	<!--
+		<select id="selectRkzje" parameterType="map" resultType="double">
+		<![CDATA[ SELECT NVL(SUM( RK.SJ_JE),0) AS RKZJE FROM NSR_RKXX RK ]]>
+		<where> <if test="startDate!=null"> <![CDATA[
+		RK.SFSSQ_QSRQ>=TO_DATE(#{startDate},'yyyy-MM-dd') ]]> </if> <if
+		test="endDate!=null"> <![CDATA[ AND
+		RK.SFSSQ_ZZRQ<=TO_DATE(#{endDate},'yyyy-MM-dd') ]]> </if> <if
+		test="swglm!=null"> <![CDATA[ AND RK.SWGLM=#{swglm} ]]> </if> </where>
+		</select>
+	-->
+
+	<!-- 欠税信息查询 -->
+	<resultMap type="QsxxVo" id="qsxxMap">
+		<result property="sbrq" column="SBRQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zsxm" column="ZSXM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zspm" column="ZSPM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="sfssq" column="SFSSQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="qsje" column="RKJE" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="jkqx" column="JKQX" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="kjrq" column="JKRQ" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectQsxx" parameterType="map" resultMap="qsxxMap">	
+	<![CDATA[
+	SELECT B.SWGLM,B.SBRQ,B.ZSXM,B.ZSPM,B.SFSSQ,B.QSJE,B.JKQX,B.JKRQ
+	FROM(
+    	SELECT A.SWGLM,
+           	   TO_CHAR(A.SBRQ,'yyyy-MM-dd') AS SBRQ,
+           	   (SELECT XM.MC FROM DB_ZGXT.T_DM_GY_ZSXM XM WHERE XM.ZSXM_DM=A.ZSXM) ZSXM,
+           	   (SELECT PM.MC FROM DB_ZGXT.T_DM_GY_ZSPM PM WHERE PM.ZSPM_DM=A.ZSPM AND PM.ZSXM_DM=A.ZSXM) ZSPM,
+           	   TO_CHAR(A.SFSSQ_QSRQ,'yyyy-MM-dd')||'至'||TO_CHAR(A.SFSSQ_ZZRQ,'yyyy-MM-dd') AS SFSSQ,
+           	   A.QSJE,
+           	   TO_CHAR(A.JKQX,'yyyy-MM-dd') AS JKQX,
+           	   TO_CHAR(A.JKRQ,'yyyy-MM-dd') AS JKRQ,
+           	   ROWNUM RN
+    	FROM(
+        	SELECT QS.SWGLM,
+       			   QS.ZSXM_DM AS ZSXM,
+       			   QS.ZSPM_DM AS ZSPM,
+       			   QS.SFSSQ_QSRQ,
+               	   QS.SFSSQ_ZZRQ,    				   
+       			   QS.SB_RQ AS SBRQ,
+       			   QS.SJ_JE AS QSJE, 
+       			   QS.JK_QX AS JKQX,
+       			   QS.KJ_RQ AS JKRQ      				
+	 		FROM DB_ZGXT.T_ZS_JKMX QS 
+        	WHERE KJ_RQ IS NULL AND JK_QX<SYSDATE
+      		AND TZLX_DM='00' and RK_RQ is  null and ZF_BJ=0 and PZ_XH is not null        	
+        	AND QS.SWGLM=#{swglm,jdbcType=VARCHAR}	
+        	ORDER BY SBRQ DESC,ZSXM,ZSPM 
+    		)A
+    	WHERE ROWNUM<#{endNum})B
+	WHERE B.RN>#{startNum}
+	]]>
+	</select>
+	<!--
+		<select id="selectQsxx" parameterType="map" resultMap="qsxxMap">
+		<![CDATA[ SELECT
+		B.SWGLM,B.SBRQ,B.ZSXM,B.ZSPM,B.SFSSQ,B.QSJE,B.JKQX,B.JKRQ FROM (SELECT
+		A.SWGLM,A.SBRQ,A.ZSXM,A.ZSPM,A.SFSSQ,A.QSJE,A.JKQX,A.JKRQ,ROWNUM RN
+		FROM (SELECT QS.SWGLM, QS.ZSXM||' '||QS.ZSXM AS ZSXM, QS.ZSPM||'
+		'||QS.ZSPM AS ZSPM,
+		TO_CHAR(QS.SFSSQ_QSRQ,'yyyy-MM-dd')||'至'||TO_CHAR(QS.SFSSQ_ZZRQ,'yyyy-MM-dd')
+		AS SFSSQ, TO_CHAR(QS.SB_RQ,'yyyy-MM-dd') AS SBRQ, QS.QSFS_JE AS QSJE,
+		TO_CHAR(QS.JK_QX,'yyyy-MM-dd') AS JKQX, TO_CHAR(QS.KJ_RQ,'yyyy-MM-dd')
+		AS JKRQ, TO_CHAR(QS.RK_RQ,'yyyy-MM-dd') AS RKRQ FROM NSR_QSXX QS ]]>
+		<where> <if test="endDate!=null"> <![CDATA[
+		QS.SB_RQ<=TO_DATE(#{endDate},'yyyy-MM-dd') ]]> </if> <if
+		test="swglm!=null"> <![CDATA[ AND QS.SWGLM=#{swglm} ]]> </if> </where>
+		<![CDATA[ ORDER BY SBRQ DESC,QS.ZSXM,QS.ZSPM )A WHERE
+		ROWNUM<#{endNum})B WHERE B.RN>#{startNum} ]]> </select>
+	-->
+	<select id="selectQszje" parameterType="map" resultType="double">	
+	<![CDATA[
+    SELECT NVL(SUM(QS.SJ_JE),0) AS QSZJE     				
+	FROM DB_ZGXT.T_ZS_JKMX QS 
+    WHERE KJ_RQ IS NULL AND JK_QX<SYSDATE
+    AND TZLX_DM='00' and RK_RQ is  null and ZF_BJ=0 and PZ_XH is not null
+    AND QS.SWGLM=#{swglm,jdbcType=VARCHAR} 
+	]]>
+	</select>
+	<!--
+		<select id="selectQszje" parameterType="map" resultType="double">
+		<![CDATA[ SELECT NVL(sum(QS.QSFS_JE),0) AS QSZJE FROM NSR_QSXX QS ]]>
+		<where> <if test="endDate!=null"> <![CDATA[
+		QS.SB_RQ<=TO_DATE(#{endDate},'yyyy-MM-dd') ]]> </if> <if
+		test="swglm!=null"> <![CDATA[ AND QS.SWGLM=#{swglm} ]]> </if> </where>
+		</select>
+	-->
+
+	<!-- 退税信息 -->
+	<resultMap type="TsxxVo" id="tsxxMap">
+		<result property="zsxm" column="ZSXM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zspm" column="ZSPM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="sfssq" column="SFSSQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="tssqrq" column="SQRQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="tsje" column="TSJE" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="tsrq" column="TSRQ" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectTsxx" parameterType="map" resultMap="tsxxMap">
+<![CDATA[		
+SELECT B.SWGLM,
+  B.ZSXM,
+  B.ZSPM,
+  B.SFSSQ,
+  B.SQRQ,
+  B.TSJE,
+  B.TSRQ
+FROM
+  (SELECT A.SWGLM,
+    A.ZSXM,
+    A.ZSPM,
+    A.SFSSQ,
+    A.SQRQ,
+    A.TSJE,
+    A.TSRQ,
+    ROWNUM RN
+  FROM
+    (
+    SELECT V.SWGLM,
+    NULL AS SFSSQ,
+    NULL AS SQRQ,
+       (SELECT XM.ZSXM_DM|| ' '||XM.MC FROM DB_ZGXT.T_DM_GY_ZSXM XM WHERE XM.ZSXM_DM= T.ZSXM_DM) AS ZSXM,
+       (SELECT PM.ZSPM_DM|| ' '||PM.MC FROM DB_ZGXT.T_DM_GY_ZSPM PM WHERE PM.ZSXM_DM=T.ZSXM_DM AND PM.ZSPM_DM= T.ZSPM_DM) AS ZSPM,
+       T.ST_JE   AS TSJE,
+       TO_CHAR(V.TS_RQ,'yyyy-MM-dd')  AS TSRQ 
+    FROM DB_ZGXT.T_QS_TSPZ V  JOIN DB_ZGXT.T_QS_TSPZMX T ON  V.DZSPH_XH=T.DZSPH_XH 
+    WHERE ZF_RQ IS NULL   
+    ]]>
+		<if test="startDate!=null">
+	 		<![CDATA[ 
+	 		 AND V.TS_RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	 		 ]]>
+		</if>
+		<if test="endDate!=null">	 		
+	 		<![CDATA[  
+	 		 AND V.TS_RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	 		]]>
+		</if>    
+ <![CDATA[
+    AND V.SWGLM=#{swglm,jdbcType=VARCHAR}
+    ORDER BY TSRQ DESC,ZSXM,ZSPM
+    )A
+  WHERE ROWNUM<#{endNum}
+  )B
+WHERE B.RN>#{startNum}
+]]>
+	</select>
+<!-- 
+	<select id="selectTsxx" parameterType="map" resultMap="tsxxMap">	
+	<![CDATA[
+	SELECT B.SWGLM,B.ZSXM,B.ZSPM,B.SFSSQ,B.SQRQ,B.TSJE,B.TSRQ 
+ 	FROM (
+  		SELECT A.SWGLM,A.ZSXM,A.ZSPM,A.SFSSQ,A.SQRQ,A.TSJE,A.TSRQ,ROWNUM RN 
+  		FROM (
+    		SELECT TS.SWGLM, 
+            	TS.ZSXM||' '||TS.ZSXM AS ZSXM, 
+            	TS.ZSPM||' '||TS.ZSPM AS ZSPM, 
+            	TO_CHAR(TS.SFSSQ_QSRQ,'yyyy-MM-dd')||'至'||TO_CHAR(TS.SFSSQ_ZZRQ,'yyyy-MM-dd') AS SFSSQ, 
+            	TO_CHAR(TS.TSSQ_RQ,'yyyy-MM-dd') AS SQRQ, 
+            	TS.TSJE AS TSJE,
+            	TO_CHAR(TS.TS_RQ,'yyyy-MM-dd') AS TSRQ
+    		FROM NSR_TSXX TS        		 
+	 ]]>
+		<where>
+			<if test="startDate!=null">
+	 		<![CDATA[ 
+	 		TS.TSSQ_RQ>=TO_DATE(#{startDate},'yyyy-MM-dd')
+	 		 ]]>
+			</if>
+			<if test="endDate!=null">	 		
+	 		<![CDATA[  
+	 		AND TS.TSSQ_RQ<=TO_DATE(#{endDate},'yyyy-MM-dd') 
+	 		]]>
+			</if>
+			<if test="swglm!=null">
+	 		<![CDATA[ 
+	 		  AND TS.SWGLM=#{swglm}
+	 		 ]]>
+			</if>
+		</where>
+   			  
+ 	<![CDATA[ 
+ 		 ORDER BY TSRQ DESC,ZSXM,ZSPM
+    		 )A
+    	 WHERE ROWNUM<#{endNum})B
+	 WHERE B.RN>#{startNum}
+	]]>
+	</select>
+ -->
+ <select id="selectTszje" parameterType="map" resultType="double">
+ <![CDATA[ 
+  	SELECT  NVL(SUM(T.ST_JE),0) AS TSJE
+    FROM DB_ZGXT.T_QS_TSPZ V  JOIN DB_ZGXT.T_QS_TSPZMX T ON  V.DZSPH_XH=T.DZSPH_XH 
+    WHERE ZF_RQ IS NULL   
+    ]]>
+		<if test="startDate!=null">
+	 		<![CDATA[ 
+	 		 AND V.TS_RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	 		 ]]>
+		</if>
+		<if test="endDate!=null">	 		
+	 		<![CDATA[  
+	 		 AND V.TS_RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	 		]]>
+		</if>    
+ <![CDATA[
+    AND V.SWGLM=#{swglm,jdbcType=VARCHAR}
+ ]]>
+ </select>
+ <!--  
+	<select id="selectTszje" parameterType="map" resultType="double">	
+	<![CDATA[
+		 SELECT  NVL(SUM(TS.TSJE),0) AS TSJE
+    	 FROM NSR_TSXX TS 
+	]]>
+		<where>
+			<if test="startDate!=null">
+	 		<![CDATA[ 
+	 		TS.TSSQ_RQ>=TO_DATE(#{startDate},'yyyy-MM-dd')
+	 		 ]]>
+			</if>
+			<if test="endDate!=null">	 		
+	 		<![CDATA[  
+	 		AND TS.TSSQ_RQ<=TO_DATE(#{endDate},'yyyy-MM-dd') 
+	 		]]>
+			</if>
+			<if test="swglm!=null">
+	 		<![CDATA[ 
+	 		  AND TS.SWGLM=#{swglm}
+	 		 ]]>
+			</if>
+		</where>
+	</select>
+-->
+
+	<!-- 发票领用存查询  
+		A1	发票领购
+		B1	发票验旧
+		B2	纳税人发票缴销
+		B3	纳税人发票核销-->
+	<resultMap type="FpxxVo" id="fpxxMap">
+		<result property="riqi" column="RQ" javaType="string" jdbcType="VARCHAR" />
+		<result property="fpzl" column="FPZL" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="qshm" column="QSHM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="zzhm" column="ZZHM" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="slfs" column="SLFS" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="fppc" column="FPPC" javaType="string"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<select id="selectFply" parameterType="map" resultMap="fpxxMap">	
+	<![CDATA[
+	SELECT B.RQ,B.FPZL,B.QSHM,B.ZZHM,B.SLFS,B.FPPC 
+ 	FROM (
+  		SELECT A.RQ,A.FPZL_DM||' '||A.FPZL_MC AS FPZL,A.QSHM,A.ZZHM,A.SLFS,A.FPPC,ROWNUM RN 
+  		FROM (
+    		SELECT  TO_CHAR(FP.RQ,'YYYY-MM-DD')  RQ,
+					FP.FPZL_DM,
+          			FP.FPZL_MC ,
+					FP.FP_QSHM QSHM,
+					FP.FP_ZZHM ZZHM,          
+					FP.FP_ZZHM-FP.FP_QSHM+1 SLFS,         
+					FP.FPPC  
+			FROM DB_ZGXT.T_FP_NSRJXCMX  FP			      		 
+      		WHERE CRKYY_DM='A1' 
+ ]]>
+      		<if test="startDate!=null">
+	 		<![CDATA[ 
+	 		AND FP.RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')	
+	 		 ]]>
+			</if>
+			<if test="endDate!=null">	 		
+	 		<![CDATA[  
+	 		AND  FP.RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	 		]]>
+			</if>
+ 	<![CDATA[ 	 		
+      		AND FP.SWGLM=#{swglm,jdbcType=VARCHAR}	 
+ 		  	ORDER BY RQ DESC,FPZL_DM
+    		 )A
+    	 WHERE ROWNUM<#{endNum})B
+	 WHERE B.RN>#{startNum}
+	]]>
+	</select>
+	
+	<!-- 
+	<select id="selectFply" parameterType="map" resultMap="fpxxMap">	
+	<![CDATA[
+	SELECT B.RQ,B.FPZL,B.QSHM,B.ZZHM,B.SLFS,B.FPPC 
+ 	FROM (
+  		SELECT A.RQ,A.FPZL,A.QSHM,A.ZZHM,A.SLFS,A.FPPC,ROWNUM RN 
+  		FROM (
+    		SELECT  FP.LY_RQ  RQ,
+					FP.FPZL||' '||FP.FPZL AS FPZL,
+					FP.FP_QSHM QSHM,
+					FP.FP_ZZHM ZZHM,
+					FP.SL SLFS,
+					FP.FPPC  
+			FROM NSR_FPLGXX FP			      		 
+	 ]]>
+		<where>
+			<if test="startDate!=null">
+	 		<![CDATA[ 
+	 		FP.LY_RQ>=TO_DATE(#{startDate},'yyyy-MM-dd')
+	 		 ]]>
+			</if>
+			<if test="endDate!=null">	 		
+	 		<![CDATA[  
+	 		AND  FP.LY_RQ<=TO_DATE(#{endDate},'yyyy-MM-dd')
+	 		]]>
+			</if>
+			<if test="swglm!=null">
+	 		<![CDATA[ 
+	 		  AND FP.SWGLM=#{swglm}
+	 		 ]]>
+			</if>
+		</where>   			  
+ 	<![CDATA[ 
+ 		 ORDER BY RQ DESC,FP.FPZL
+    		 )A
+    	 WHERE ROWNUM<#{endNum})B
+	 WHERE B.RN>#{startNum}
+	]]>
+	</select>
+	 -->
+	<select id="selectFpjxhx" parameterType="map" resultMap="fpxxMap">	
+	<![CDATA[ 
+	SELECT B.RQ,B.FPZL,B.QSHM,B.ZZHM,B.SLFS,B.FPPC 
+ 	FROM (
+  		SELECT A.RQ,A.FPZL_DM||' '||A.FPZL_MC AS FPZL,A.QSHM,A.ZZHM,A.SLFS,A.FPPC,ROWNUM RN 
+  		FROM (
+    		SELECT  TO_CHAR(FP.RQ,'YYYY-MM-DD')  RQ,
+					FP.FPZL_DM,
+          			FP.FPZL_MC ,
+					FP.FP_QSHM QSHM,
+					FP.FP_ZZHM ZZHM,          
+					FP.FP_ZZHM-FP.FP_QSHM+1 SLFS,         
+					FP.FPPC  
+			FROM DB_ZGXT.T_FP_NSRJXCMX  FP			      		 
+      		WHERE CRKYY_DM='B2' 
+ ]]>
+      		<if test="startDate!=null">
+	 		<![CDATA[ 
+	 		AND FP.RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')	
+	 		 ]]>
+			</if>
+			<if test="endDate!=null">	 		
+	 		<![CDATA[  
+	 		AND  FP.RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	 		]]>
+			</if>
+ 	<![CDATA[ 	 		
+      		AND FP.SWGLM=#{swglm,jdbcType=VARCHAR}	 
+ 		  	ORDER BY RQ DESC,FPZL_DM
+    		 )A
+    	 WHERE ROWNUM<#{endNum})B
+	 WHERE B.RN>#{startNum}
+	 ]]>
+	</select>
+	<!-- 
+	<select id="selectFpjxhx" parameterType="map" resultMap="fpxxMap">	
+	<![CDATA[
+	SELECT B.RQ,B.FPZL,B.QSHM,B.ZZHM,B.SLFS,B.FPPC 
+ 	FROM (
+  		SELECT A.RQ,A.FPZL,A.QSHM,A.ZZHM,A.SLFS,A.FPPC,ROWNUM RN 
+  		FROM (
+    		SELECT  FP.JHX_RQ  RQ,
+					FP.FPZL||' '||FP.FPZL AS FPZL,
+					FP.FP_QSHM QSHM,
+					FP.FP_ZZHM ZZHM,
+					FP.SL SLFS,
+					FP.FPPC  
+			FROM NSR_FPJHX FP			      		 
+	 ]]>
+		<where>
+			<if test="startDate!=null">
+	 		<![CDATA[ 
+	 		FP.JHX_RQ>=TO_DATE(#{startDate},'yyyy-MM-dd')
+	 		 ]]>
+			</if>
+			<if test="endDate!=null">	 		
+	 		<![CDATA[  
+	 		AND  FP.JHX_RQ<=TO_DATE(#{endDate},'yyyy-MM-dd')
+	 		]]>
+			</if>
+			<if test="swglm!=null">
+	 		<![CDATA[ 
+	 		  AND FP.SWGLM=#{swglm}
+	 		 ]]>
+			</if>
+		</where>   			  
+ 	<![CDATA[ 
+ 		 ORDER BY RQ DESC,FP.FPZL
+    		 )A
+    	 WHERE ROWNUM<#{endNum})B
+	 WHERE B.RN>#{startNum}
+	]]>
+	</select>
+	 -->
+	<select id="selectFpkc" parameterType="map" resultMap="fpxxMap"> 
+<![CDATA[
+SELECT B.RQ,B.FPZL,B.QSHM,B.ZZHM,B.SLFS,B.FPPC 
+FROM (
+  SELECT A.RQ,(SELECT ZL.FPZL_DM||' '||ZL.MC FROM DB_ZGXT.T_DM_FP_FPZL ZL WHERE ZL.FPZL_DM=A.FPZL_DM) FPZL,A.QSHM,A.ZZHM,A.SLFS,A.FPPC,ROWNUM RN 
+  FROM (
+    	SELECT SWGLM,
+          	   TO_CHAR(FP.GP_RQ,'YYYY-MM-DD')  RQ,
+          	   FP.FPZL_DM,
+			   FP.FP_QSHM QSHM,
+			   FP.FP_ZZHM ZZHM,
+			   FP.FP_ZZHM-FP.FP_QSHM+1 SLFS,
+			   FP.FPPC  
+		FROM DB_ZGXT.T_FP_NSRFPKC FP			      		 
+      	WHERE 1=1
+      	]]>
+      	<if test="startDate!=null">
+	 		<![CDATA[ 
+	 		AND FP.GP_RQ>=TO_DATE(#{startDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	 		 ]]>
+		</if>
+		<if test="endDate!=null">	 		
+	 		<![CDATA[  
+	 		AND  FP.GP_RQ<=TO_DATE(#{endDate,jdbcType=VARCHAR},'yyyy-MM-dd')
+	 		]]>
+		</if>
+ <![CDATA[	 	
+      	AND FP.SWGLM=#{swglm,jdbcType=VARCHAR}
+ 		ORDER BY RQ DESC,FPZL_DM
+    	)A
+  WHERE ROWNUM<#{endNum})B
+WHERE B.RN>#{startNum}
+]]>
+	</select> 
+	<!--  
+	<select id="selectFpkc" parameterType="map" resultMap="fpxxMap">	
+	<![CDATA[
+	SELECT B.RQ,B.FPZL,B.QSHM,B.ZZHM,B.SLFS,B.FPPC 
+ 	FROM (
+  		SELECT A.RQ,A.FPZL,A.QSHM,A.ZZHM,A.SLFS,A.FPPC,ROWNUM RN 
+  		FROM (
+    		SELECT  FP.GP_RQ  RQ,
+					FP.FPZL||' '||FP.FPZL AS FPZL,
+					FP.FP_QSHM QSHM,
+					FP.FP_ZZHM ZZHM,
+					FP.SL SLFS,
+					FP.FPPC  
+			FROM NSR_FPKC FP			      		 
+	 ]]>
+		<where>
+			<if test="startDate!=null">
+	 		<![CDATA[ 
+	 		FP.GP_RQ>=TO_DATE(#{startDate},'yyyy-MM-dd')
+	 		 ]]>
+			</if>
+			<if test="endDate!=null">	 		
+	 		<![CDATA[  
+	 		AND  FP.GP_RQ<=TO_DATE(#{endDate},'yyyy-MM-dd')
+	 		]]>
+			</if>
+			<if test="swglm!=null">
+	 		<![CDATA[ 
+	 		  AND FP.SWGLM=#{swglm}
+	 		 ]]>
+			</if>
+		</where>   			  
+ 	<![CDATA[ 
+ 		 ORDER BY RQ DESC,FP.FPZL
+    		 )A
+    	 WHERE ROWNUM<#{endNum})B
+	 WHERE B.RN>#{startNum}
+	]]>
+	</select>
+-->
+
+	<!-- 财务信息查询 -->
+	<resultMap type="CwxxVo" id="cwxxMap">
+		<result property="qykjzd" column="QYKJZD" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="bsrq" column="BSRQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="ssq" column="SSQ" javaType="string" jdbcType="VARCHAR" />
+		<result property="zyywcb" column="ZYYWCB" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="yfzk" column="YFZK" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="cwfy" column="CWFY" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="yysr" column="ZYYWSR" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="xsfy" column="YYFY" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="glfy" column="GLFY" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="lrze" column="LRZE" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="sds" column="SDSE" javaType="double" jdbcType="DOUBLE" />
+		<result property="jlr" column="SHZLR" javaType="double" jdbcType="DOUBLE" />
+		<result property="zczz" column="ZCHJ" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="fzzz" column="FZHJ" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="syzqy" column="SYZQYHJ" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="yszk" column="YSZK" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="gdzczz" column="GDZCJZ" javaType="double"
+			jdbcType="DOUBLE" />
+		<result property="sszb" column="SSZB" javaType="double"
+			jdbcType="DOUBLE" />
+	</resultMap>
+	
+	<select id="selectCwxx" parameterType="map" resultMap="cwxxMap">
+	<![CDATA[
+SELECT B.SWGLM,B.QYKJZD,B.BSRQ,B.SSQ,B.ZYYWSR,B.ZYYWCB,B.YYFY,B.GLFY,B.CWFY,B.LRZE,B.SDSE,B.SHZLR,B.ZCHJ,B.FZHJ,B.SYZQYHJ,B.YSZK,B.YFZK,B.GDZCJZ,B.SSZB   
+FROM (
+	SELECT A.*,ROWNUM RN 
+   	FROM (
+       SELECT  CW.SWGLM,
+				  (SELECT V.MC FROM DB_ZGXT.T_DM_GY_KJZD V WHERE V.QYKJZD_DM=FB.QYKJZD_DM) AS QYKJZD,
+          TO_CHAR(CW.TJ_SJ,'YYYY-MM-DD') AS BSRQ,
+          CW.SSQ,
+          CW.ZYYWSR,
+          CW.ZYYWCB,
+          CW.YYFY,
+          CW.GLFY,
+          CW.CWFY,
+          CW.LRZE,
+          CW.SDSE,
+          CW.SHZLR,
+          CW.ZCHJ,
+          CW.FZHJ,
+          CW.SYZQYHJ,
+          CW.YSZK,
+          CW.YFZK,
+          CW.GDZCJZ,
+          CW.SSZB
+       FROM DB_ZGXT.NSR_CWXX CW JOIN DB_ZGXT.T_DJ_JGNSRFB FB ON CW.SWGLM=FB.SWGLM  
+       WHERE  SUBSTR(CW.SSQ, 0, 4)=#{nf} 		
+       AND CW.SWGLM=#{swglm,jdbcType=VARCHAR}      		
+       ORDER BY SSQ DESC 
+      		)A  
+  WHERE ROWNUM<#{endNum})B 
+WHERE B.RN>#{startNum}
+]]>
+	</select>
+	<!--
+	<select id="selectCwxx" parameterType="map" resultMap="cwxxMap">	
+	<![CDATA[
+	SELECT B.SWGLM,B.QYKJZD,B.BSRQ,B.SSQ,B.ZYYWCB,B.YFZK,B.CWFY,B.YYSR,B.XSFY,B.GLFY,B.LRZE,B.SDS,B.JLR,B.ZCZZ,B.FZZZ,B.SYZQY,B.YSZK,B.GDZCJZ,B.SSZB 
+	FROM (
+		SELECT A.*,ROWNUM RN 
+   		FROM (
+      		SELECT  CW.SWGLM,
+				   CW.QYKJZD_DM||' '||CW.QYKJZD_DM AS QYKJZD,
+             		TO_CHAR(CW.BS_RQ,'yyyy-MM-dd') AS BSRQ,
+              		CW.SSQ,
+              		CW.YYSR,
+              		CW.XSFY,
+               		CW.GLFY,
+              		CW.LRZE,
+             		CW.SDS,
+            		CW.JLR,
+            		CW.ZCZZ,
+             		CW.FZZZ,
+            		CW.SYZQY,
+            		CW.YSZK,
+            		CW.GDZCJZ,
+            		CW.SSZB,
+            		CW.ZYYWCB,
+              		CW.YFZK,
+              		CW.CWFY
+      		FROM NSR_CWXX CW 
+      	]]>
+		<where>
+			<if test="swglm!=null">
+	 		<![CDATA[ 
+	 		  SUBSTR(CW.SSQ, 0, 4)=#{nf}
+	 		 ]]>
+			</if>
+			<if test="swglm!=null">
+	 		<![CDATA[ 
+      		AND CW.SWGLM=#{swglm}
+      		 ]]>
+			</if>
+		</where>   			  
+ 	<![CDATA[ 
+      		ORDER BY SSQ DESC )A  
+    	WHERE ROWNUM<#{endNum})B 
+	WHERE B.RN>#{startNum}
+	]]>
+	</select>
+  -->
+
+
+	<!-- 违章信息查询 -->
+	<resultMap type="WzxxVo" id="wzxxMap">
+		<result property="wzcfrq" column="CFRQ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="wzyy" column="WZYY" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="wzcfyj" column="CFYJ" javaType="string"
+			jdbcType="VARCHAR" />
+		<result property="cfje" column="CFJE" javaType="double"
+			jdbcType="DOUBLE" />
+	</resultMap>
+	
+	<select id="selectWzxx" parameterType="map" resultMap="wzxxMap">	
+<![CDATA[
+SELECT B.SWGLM,
+    B.CFRQ,
+    B.WZYY,
+    B.CFYJ,
+    B.CFJE
+FROM
+    (SELECT A.*,
+      		ROWNUM RN
+     FROM
+      (SELECT WZ.SWGLM,
+        	  TO_CHAR(WZ.ZZ_RQ,'YYYY-MM-DD') AS CFRQ,
+        	  WZ.WFWZSD_MC AS WZYY,
+        	  WZ.CFJD  AS CFYJ,
+        	  WZ.FK_JE AS CFJE
+       FROM DB_ZGXT.NSR_WZCFJL WZ
+       WHERE  TO_CHAR(WZ.ZZ_RQ,'YYYY')=#{nf}      
+       AND WZ.SWGLM=#{swglm,jdbcType=VARCHAR}
+       ORDER BY CFRQ DESC
+      )A
+     WHERE ROWNUM<#{endNum}
+    )B
+WHERE B.RN>#{startNum}      	
+	]]>
+	</select>
+</mapper>

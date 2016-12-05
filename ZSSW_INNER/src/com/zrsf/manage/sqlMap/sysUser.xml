@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.manage.sys">
+	<cache />
+	
+	<resultMap type="SysUser" id="sysUser">
+		<id property="code" column="SWRY_DM" javaType="string" jdbcType="VARCHAR" />
+		<result property="jobNumber" column="SWRY_GH" javaType="string"	jdbcType="VARCHAR" />
+		<result property="name" column="MC" javaType="string"	jdbcType="VARCHAR" />
+		<result property="password" column="PASSWORD" javaType="string"	jdbcType="VARCHAR" />
+		<result property="limit" column="HTQX" javaType="int"	jdbcType="INTEGER" />		
+	</resultMap>
+
+	<select id="selectLogin" resultMap="sysUser" parameterType="java.util.Map">
+  	<![CDATA[
+	SELECT SWRY_DM,
+		   SWRY_GH,
+		   MC,
+		   HTQX 
+	FROM SWRY 
+	WHERE HTQX>0 
+	AND USERPASSWORD=#{password} 
+	AND SWRY_GH=#{swryGh}		
+  	]]>
+	</select>
+	
+
+</mapper>

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zrsf.map.sx">
+<cache />
+	<resultMap type="NotificationVO" id="notification">
+		<id     property="sxxxid" column="id" javaType="string" jdbcType="BIGINT"/>
+   	    <result property="xxlyDm" column="xxly" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="xxlyMc" column="mc" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="xxlxDm" column="xxlx" javaType="string" jdbcType="CHAR"/>
+   	    <result property="cjsj" column="fssj" javaType="DATE" jdbcType="TIMESTAMP"/>
+   	    <result property="xxnr" column="xxzw" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="xxid" column="nrid"  javaType="string" jdbcType="VARCHAR"/>   
+   	    <result property="xyhz" column="xyhz"  javaType="string" jdbcType="CHAR"/>  
+   	    <result property="xxlyTb" column="xxlytb"  javaType="string" jdbcType="VARCHAR"/>	   	           
+	</resultMap>
+
+	<insert id="insertMessage"  parameterType="java.util.HashMap" >	
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="messageId">		
+			SELECT SX_XXNR_ID_SEQ.NEXTVAL AS messageId FROM DUAL
+		</selectKey>
+		INSERT INTO SX_XXNR(XXNRID,XXZW,XYHZ) VALUES(#{messageId},#{content,jdbcType=VARCHAR},#{xyhz,jdbcType=VARCHAR})	
+	</insert>
+	
+	<insert id="insertSxxx"  parameterType="java.util.HashMap" >					
+		<choose>
+			<when test="tx!=null">
+				INSERT INTO SXXX(XXLY,XXDX,XXLX,XXNRID) SELECT #{fromRy},LXR_DM,#{xxlx},#{messId} FROM TXLXR WHERE TX_DM=#{tx}
+			</when>
+			<otherwise>
+				INSERT INTO SXXX(XXLY,XXDX,XXLX,XXNRID)
+				<foreach collection="toRy" index="index" item="ry" separator="union " close="">
+    				<![CDATA[
+   						SELECT #{fromRy},#{ry},#{xxlx},#{messId} FROM DUAL
+   					]]>
+				</foreach>
+			</otherwise>		
+		</choose>		
+	</insert>
+	
+	<select id="selectTxRy" resultType="java.lang.String"
+		parameterType="java.lang.String">
+  	<![CDATA[
+  		SELECT TX.LXR_DM  				
+		FROM TXLXR TX 		
+		WHERE TX.TX_DM=#{tx}		
+  	]]>
+	</select>
+	
+	<!-- 查询税务人员A发给税务人员B的未推送消息 -->
+	<select id="selectWdxx" resultMap="notification"
+		parameterType="map" useCache="false">
+  	<![CDATA[  		
+  	SELECT  SX.SXXX_ID AS "id" , 
+        	SX.XXLY AS "xxly",
+  			(SELECT RY.MC FROM SWRY RY WHERE RY.SWRY_DM=SX.XXLY) AS "mc",         	
+  			(SELECT XX.XXZW FROM SX_XXNR XX WHERE XX.XXNRID=SX.XXNRID) AS "xxzw",   
+        	SX.XXLX AS "xxlx",
+  			SX.CJSJ  AS "fssj",
+  			SX.XXNRID AS "nrid",
+       		(SELECT 'http://61.177.61.251:8222/shuixin/tx/'||NVL( RY.TXTP,'xttx.png') FROM SWRY RY WHERE RY.SWRY_DM=SX.XXLY)	AS "xxlytb",
+        	(SELECT XX.XYHZ FROM SX_XXNR XX WHERE XX.XXNRID=SX.XXNRID) AS "xyhz"
+     FROM SXXX SX
+     WHERE SX.XXDX=#{toSwry,jdbcType=VARCHAR} AND SX.YDYFS_BJ='0' AND XXLY=#{fromLxr,jdbcType=VARCHAR} AND XXLX='0'
+	 ORDER BY SX.CJSJ ASC
+  	]]>
+	</select>
+	
+	
+	<update id="updateMessageState" parameterType="java.util.List" flushCache="true">
+		UPDATE SXXX SET YDYFS_BJ='1' WHERE SXXX_ID IN
+		<foreach collection="list" index="index" item="sxxxid" separator="," close=")" open="(">
+    		<![CDATA[
+   				#{sxxxid,jdbcType=VARCHAR}
+   			]]>
+		</foreach>
+	</update>
+	
+	
+	
+	
+	
+	<!-- 通过设备号查询该设备持有人未推送消息 -->
+	<select id="selectNoSendMessageByDeviceId" resultMap="notification"
+		parameterType="java.lang.String" useCache="false">
+  	<![CDATA[  		
+  	 SELECT SX.SXXX_ID AS "id" , 
+        	SX.XXLY AS "xxly",
+  			DECODE(SX.XXLX,'1', (SELECT L.LM_MC FROM LM L WHERE L.LM_DM=SX.XXLY),(SELECT RY.MC FROM SWRY RY WHERE RY.SWRY_DM=SX.XXLY)) AS "mc",  
+        	DECODE(SX.XXLX,'1', (SELECT LX.BT FROM SX_LMTS LX WHERE LX.ID=SX.XXNRID),(SELECT XX.XXZW FROM SX_XXNR XX WHERE XX.XXNRID=SX.XXNRID)) AS "xxzw",   
+        	SX.XXLX AS "xxlx",
+  			SX.CJSJ  AS "fssj",
+  			SX.XXNRID AS "nrid",
+        	DECODE(SX.XXLX,'1', (SELECT LM.LM_TB FROM LM  WHERE LM.LM_DM=SX.XXLY),(SELECT 'http://61.177.61.251:8222/shuixin/tx/'||NVL( RY.TXTP,'xttx.png') FROM SWRY RY WHERE RY.SWRY_DM=SX.XXLY))	AS "xxlytb",
+        	DECODE(SX.XXLX,'1', NULL,(SELECT XX.XYHZ FROM SX_XXNR XX WHERE XX.XXNRID=SX.XXNRID)) AS "xyhz"  	 
+	FROM SXXX SX JOIN SWRY RY ON SX.XXDX=RY.SWRY_DM
+	WHERE RY.DEVICEID=#{deviceId,jdbcType=VARCHAR}
+	AND SX.YDYFS_BJ='0' 
+	ORDER BY SX.CJSJ ASC
+  	]]>
+	</select>	
+	
+	
+	<update id="updateMessageStateToRead" parameterType="java.util.List" flushCache="true">
+		UPDATE SXXX SET YDYFS_BJ='2' WHERE XXNRID=#{messId}   AND  XXDX=#{swryDm}
+	</update>
+	
+	
+	<select id="selectMessageById" resultType="java.util.HashMap"
+		parameterType="java.lang.String">
+  	<![CDATA[  		
+  		SELECT XXZW AS "xxzw",       		  
+       		   TO_CHAR(RK_SJ,'yyyy-MM-dd hh24:mi:dd') AS "fssj",
+       		   XYHZ AS "xyhz"
+		FROM SX_XXNR 
+		WHERE XXNRID=#{messId}
+  	]]>
+	</select>	
+	
+	<select id="selectToSwryByMessageId" resultType="java.util.HashMap"
+		parameterType="java.lang.String" useCache="false">
+  	<![CDATA[  		
+  		SELECT SX.XXDX AS "swryDm",
+       		   RY.MC  AS  "xm",
+       		   SX.YDYFS_BJ AS "ydyfs"
+		FROM SXXX SX JOIN SWRY RY ON SX.XXDX=RY.SWRY_DM 
+		WHERE SX.XXNRID=#{messageId}
+		ORDER BY NLSSORT("xm",'NLS_SORT=SCHINESE_PINYIN_M')
+  	]]>
+	</select>	
+	
+	<!-- 将外网各栏目需要推送的信息存入内网数据库 -->
+	<insert id="insertLmts"  parameterType="NewsSendVo" >
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="id">		
+			SELECT SX_XXNR_ID_SEQ.NEXTVAL AS id FROM DUAL
+		</selectKey>
+		<![CDATA[  
+		INSERT INTO SX_LMTS(ID,NEWSID,BT) VALUES(#{id},#{newsId,jdbcType=VARCHAR},#{title,jdbcType=VARCHAR})
+		]]>	
+	</insert>
+	
+	<!-- 根据新接收到的栏目信息向税信消息表插入待推送消息 -->
+	<insert id="insertDySx"  parameterType="NewsSendVo" >
+		<![CDATA[  
+		INSERT INTO SXXX(XXLY,XXDX,XXLX,XXNRID) SELECT DYLM,DYR,#{xxlx,jdbcType=VARCHAR},#{id,jdbcType=VARCHAR} FROM SWRY_LMDY WHERE DYLM=#{lmId,jdbcType=VARCHAR}
+		]]>	
+	</insert>
+	
+	<!--从税信消息主表中查询某个税务人员某个订阅栏目的未读信息 -->
+	<select id="selectNoPushnNewsByColumnId" resultMap="notification"
+		parameterType="map" useCache="false">
+  	<![CDATA[  		
+  	SELECT  SX.SXXX_ID AS "id", 
+        	SX.XXLY  AS "xxly",
+  			(SELECT LM.LM_MC FROM LM WHERE LM.LM_DM=SX.XXLY) AS "mc",         	
+  			T.BT AS "xxzw",   
+        	SX.XXLX AS "xxlx",
+  			SX.CJSJ  AS "fssj",
+  			T.NEWSID AS "nrid",
+        	(SELECT 'http://61.177.61.251:8222/shuixin/tx/'||NVL( LM.LM_TB,'xttx.png') FROM LM  WHERE LM.LM_DM=SX.XXLY)	AS "xxlytb",
+        	'0' AS "xyhz"
+	FROM SXXX SX ,SX_LMTS T    
+	WHERE SX.XXNRID=T.ID AND CJSJ>(TRUNC(SYSDATE)-1) AND SX.XXDX=#{swryDm,jdbcType=VARCHAR}  AND XXLY=#{lmId,jdbcType=VARCHAR} AND (XXLX='1' OR XXLX='6' )AND SX.YDYFS_BJ='0'
+	ORDER BY SX.CJSJ DESC  
+  	]]>
+	</select>	
+	
+	
+	<!-- 查询订阅某个栏目的全部税务人员 -->
+	<select id="selectSubscribers" resultMap="com.zrsf.map.txl.swry"
+		parameterType="map" useCache="false">
+  	<![CDATA[  		
+  	SELECT RY.SWRY_DM  AS "swryDm",  		 					
+  		   RY.DEVICEID AS "deviceid",
+  		   dy.dylm
+	FROM SWRY RY JOIN SWRY_LMDY DY ON RY.SWRY_DM=DY.DYR
+	WHERE DY.DYLM=#{lmId}
+  	]]>
+	</select>
+	
+	
+	
+	<!--从税信消息主表中查询某个税务人员的由其他人员发过来的未读信息 -->
+	<select id="selectNoSendPtoPMessage" resultMap="notification"
+		parameterType="map" useCache="false">
+  	<![CDATA[  		
+  	SELECT  SX.SXXX_ID AS "id" , 
+        	SX.XXLY  AS "xxly",
+        	(SELECT RY.MC FROM SWRY RY WHERE RY.SWRY_DM=SX.XXLY) AS "mc",         	
+  			(SELECT XX.XXZW FROM SX_XXNR XX WHERE XX.XXNRID=SX.XXNRID) AS "xxzw",   
+        	SX.XXLX AS "xxlx",
+  			SX.CJSJ  AS "fssj",
+  			SX.XXNRID AS "nrid",
+        	(SELECT 'http://61.177.61.251:8222/shuixin/tx/'||NVL( RY.TXTP,'xttx.png') FROM SWRY RY WHERE RY.SWRY_DM=SX.XXLY)	AS "xxlytb",
+        	(SELECT XX.XYHZ FROM SX_XXNR XX WHERE XX.XXNRID=SX.XXNRID) AS "xyhz"
+	FROM SXXX SX,SWRY RY
+	WHERE SX.XXDX=RY.SWRY_DM AND SWRY_DM=#{toSwry,jdbcType=VARCHAR}  AND XXLX='0'AND SX.YDYFS_BJ='0'
+	ORDER BY SX.CJSJ DESC
+  	]]>
+	</select>	
+	<!--从税信消息主表中查询某个税务人员的由其他人员发过来的未读信息 -->
+	<select id="selectPtoPMessageByDeviceId" resultMap="notification"
+		parameterType="map" useCache="false">
+  	<![CDATA[  		
+  	SELECT  SX.SXXX_ID AS "id" , 
+        	SX.XXLY  AS "xxly",
+        	(SELECT RY.MC FROM SWRY RY WHERE RY.SWRY_DM=SX.XXLY) AS "mc",         	
+  			(SELECT XX.XXZW FROM SX_XXNR XX WHERE XX.XXNRID=SX.XXNRID) AS "xxzw",   
+        	SX.XXLX AS "xxlx",
+  			SX.CJSJ  AS "fssj",
+  			SX.XXNRID AS "nrid",
+        	(SELECT 'http://61.177.61.251:8222/shuixin/tx/'||NVL( RY.TXTP,'xttx.png') FROM SWRY RY WHERE RY.SWRY_DM=SX.XXLY)	AS "xxlytb",
+        	(SELECT XX.XYHZ FROM SX_XXNR XX WHERE XX.XXNRID=SX.XXNRID) AS "xyhz"
+	FROM SXXX SX,SWRY RY
+	WHERE SX.XXDX=RY.SWRY_DM AND RY.DEVICEID=#{deviceId,jdbcType=VARCHAR}  AND XXLX='0'AND SX.YDYFS_BJ='0'
+	ORDER BY SX.CJSJ DESC
+  	]]>
+	</select>	
+	
+	
+	<!--从税信消息主表中查询某个税务人员所有订阅栏目的未读信息 -->
+	<select id="selectNoSendLtoPMessage" resultMap="notification"
+		parameterType="map" useCache="false">
+  	<![CDATA[  		
+  	SELECT  SX.SXXX_ID AS "id", 
+        	SX.XXLY  AS "xxly",
+  			(SELECT LM.LM_MC FROM LM WHERE LM.LM_DM=SX.XXLY) AS "mc",         	
+  			(SELECT TS.BT FROM SX_LMTS TS WHERE TS.ID=SX.XXNRID) AS "xxzw",   
+        	SX.XXLX AS "xxlx",
+  			SX.CJSJ  AS "fssj",
+  			L.NEWSID AS "nrid",
+        	(SELECT 'http://61.177.61.251:8222/shuixin/tx/'||NVL( LM.LM_TB,'xttx.png') FROM LM  WHERE LM.LM_DM=SX.XXLY)	AS "xxlytb",
+        	'0' AS "xyhz"
+	FROM SXXX SX,SWRY RY,SX_LMTS L
+	WHERE SX.XXDX=RY.SWRY_DM AND SX.XXNRID=L.ID AND SWRY_DM=#{swryDm,jdbcType=VARCHAR}  AND CJSJ>(TRUNC(SYSDATE)-1)   AND XXLX='1' AND SX.YDYFS_BJ='0'
+	ORDER BY SX.CJSJ DESC
+  	]]>
+	</select>
+	
+	<!--从税信消息主表中查询某个税务人员所有订阅栏目的未读信息 -->
+	<select id="selectLtoPMessageByDeviceId" resultMap="notification"
+		parameterType="map" useCache="false">
+  	<![CDATA[  		
+  	SELECT  SX.SXXX_ID AS "id", 
+        	SX.XXLY  AS "xxly",
+  			(SELECT LM.LM_MC FROM LM WHERE LM.LM_DM=SX.XXLY) AS "mc",         	
+  			(SELECT TS.BT FROM SX_LMTS TS WHERE TS.ID=SX.XXNRID) AS "xxzw",   
+        	SX.XXLX AS "xxlx",
+  			SX.CJSJ  AS "fssj",
+  			L.NEWSID AS "nrid",
+        	(SELECT 'http://61.177.61.251:8222/shuixin/tx/'||NVL( LM.LM_TB,'xttx.png') FROM LM  WHERE LM.LM_DM=SX.XXLY)	AS "xxlytb",
+        	'0' AS "xyhz"
+	FROM SXXX SX,SWRY RY,SX_LMTS L
+	WHERE SX.XXDX=RY.SWRY_DM AND SX.XXNRID=L.ID AND RY.DEVICEID=#{deviceId,jdbcType=VARCHAR}  AND CJSJ>(TRUNC(SYSDATE)-1)   AND XXLX='1' AND SX.YDYFS_BJ='0'
+	ORDER BY SX.CJSJ DESC
+  	]]>
+	</select>
+	
+	<select id="selectLmtsForCheck" resultType="int"
+		parameterType="String" >
+  	<![CDATA[  		
+  		select count(1) from sx_lmts where id=#{id}
+  	]]>
+	</select>
+	
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.tax">
+	<cache />
+	
+	<delete id="deleteSssryj" parameterType="java.lang.String">
+	<![CDATA[
+	DELETE FROM BB_SSSRYJ WHERE SSQ=#{ssq,jdbcType=VARCHAR}
+	]]>
+	</delete>
+
+	<insert id="insertSssryj" parameterType="com.zrsf.manage.vo.TaxStatisticRow">
+	<![CDATA[
+	INSERT INTO BB_SSSRYJ(SSQ,XH,SWJG_MC,BYYJ,SNTQ,BYTB,BNLJ,SNLJ,LJTB,SYSZ) 
+	VALUES(#{ssq,jdbcType=VARCHAR},
+		   #{xh,jdbcType=INTEGER},
+		   #{swjgMc,jdbcType=VARCHAR},
+		   #{byyj,jdbcType=DOUBLE},
+		   #{sntq,jdbcType=DOUBLE},
+		   #{bytb,jdbcType=DOUBLE},
+		   #{bnlj,jdbcType=DOUBLE},
+		   #{snlj,jdbcType=DOUBLE},
+		   #{ljtb,jdbcType=DOUBLE},
+		   #{sysz,jdbcType=DOUBLE})
+	]]>
+	</insert>
+
+	<delete id="deleteCzysyj" parameterType="java.lang.String">
+	<![CDATA[
+	DELETE FROM BB_CZYSYJ WHERE SSQ=#{ssq,jdbcType=VARCHAR}
+	]]>
+	</delete>
+	<insert id="insertCzysyj" parameterType="com.zrsf.manage.vo.TaxStatisticRow">
+	<![CDATA[
+	INSERT INTO BB_CZYSYJ(SSQ,XH,SWJG_MC,BYYJ,SNTQ,BYTB,BNLJ,SNLJ,LJTB,SYSZ) 
+	VALUES(#{ssq,jdbcType=VARCHAR},
+		  #{xh,jdbcType=INTEGER},
+		   #{swjgMc,jdbcType=VARCHAR},
+		   #{byyj,jdbcType=DOUBLE},
+		   #{sntq,jdbcType=DOUBLE},
+		   #{bytb,jdbcType=DOUBLE},
+		   #{bnlj,jdbcType=DOUBLE},
+		   #{snlj,jdbcType=DOUBLE},
+		   #{ljtb,jdbcType=DOUBLE},
+		   #{sysz,jdbcType=DOUBLE})
+	]]>
+	</insert>
+
+	<select id="selectSssryjBySsq" parameterType="string" resultType="com.zrsf.manage.vo.TaxStatisticRow">
+		<![CDATA[
+		SELECT SSQ  AS "ssq",
+			   XH   AS 	"xh",
+			   SWJG_MC AS "swjgMc",
+			   BYYJ AS "byyj",
+			   SNTQ AS "sntq",
+			   BYTB AS "bytb",
+			   SYSZ AS "sysz",
+			   BNLJ AS "bnlj",
+			   SNLJ AS "snlj",
+			   LJTB AS "ljtb"
+		FROM BB_SSSRYJ 
+		WHERE SSQ=#{ssq,jdbcType=VARCHAR}
+		ORDER BY XH
+		]]>
+	</select>
+
+	<select id="selectCzysyjBySsq" parameterType="string" resultType="com.zrsf.manage.vo.TaxStatisticRow">
+		<![CDATA[
+		SELECT SSQ AS "ssq",
+			   XH AS "xh",
+			   SWJG_MC AS "swjgMc",
+			   BYYJ AS "byyj",
+			   SNTQ AS "sntq",
+			   BYTB AS "bytb",
+			   SYSZ AS "sysz",
+			   BNLJ AS "bnlj",
+			   SNLJ AS "snlj",
+			   LJTB AS "ljtb"
+		FROM BB_CZYSYJ 
+		WHERE SSQ=#{ssq,jdbcType=VARCHAR}
+		ORDER BY XH
+		]]>
+	</select>
+
+	<select id="selectSssryjList" parameterType="string" resultType="com.zrsf.manage.vo.TaxStatisticRow">
+		<![CDATA[
+		SELECT DISTINCT(SSQ) SSQ FROM BB_SSSRYJ ORDER BY SSQ
+		]]>
+	</select>	
+
+	<select id="selectCzysyjList" parameterType="string" resultType="com.zrsf.manage.vo.TaxStatisticRow">
+		<![CDATA[
+		SELECT DISTINCT(SSQ) SSQ FROM BB_CZYSYJ ORDER BY SSQ
+		]]>
+	</select>
+	
+	<update id="updateIncome" parameterType="map"  >
+		update DB_ZGXT.SF_SJFXBB_MX t
+		set t.L1=#{c2},t.L2=#{c3},t.L3=#{c4},t.L4=#{c5},t.L5=#{c6},t.L6=#{c7},t.L7=#{c8},t.L8=#{c9}
+		where t.XH=#{c0}		
+		and t.SSQ=#{ssq}
+		and t.SC_XH=39
+	</update>
+	
+	<update id="updateIncomeTotal" parameterType="map"  >
+	update DB_ZGXT.SF_SJFXBB_MX 
+	set (L1,L2,L3,L4,L5,L6,L7,L8)=(
+    		select sum(L1),
+    			   sum(L2),
+    			   sum(L3),
+    			   round(sum(L3)/sum(L2)*100,2),
+    			   sum(L5),
+    			   sum(L6),
+    			   sum(L7),
+    			   round(sum(L7)/sum(L6)*100,2) 
+    		from DB_ZGXT.SF_SJFXBB_MX 
+    		where (XH=2 or XH=20) 
+    		and SC_XH=39 
+    		and SSQ=#{ssq})
+	where XH=1		
+	and SSQ=#{ssq}
+	and SC_XH=39
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+	<bean id="userDao" class="com.zrsf.manage.dao.UserDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="userService" class="com.zrsf.manage.service.UserService">
+		<property name="dao" ref="swrydao" />
+	</bean>
+	<bean id="userAction" class="com.zrsf.manage.action.UserAction"
+		scope="prototype">
+		<property name="service" ref="userService" />
+	</bean>
+
+	<bean id="newsDao" class="com.zrsf.manage.dao.NewsDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="newsService" class="com.zrsf.manage.service.NewsService">
+		<property name="dao" ref="newsDao" />
+	</bean>
+	<bean id="newsAction" class="com.zrsf.manage.action.NewsAction"
+		scope="prototype">
+		<property name="service" ref="newsService"></property>
+	</bean>
+	
+	<bean id="taxStatisticDao" class="com.zrsf.manage.dao.TaxStatisticDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="taxStatisticService" class="com.zrsf.manage.service.TaxExecelParseService">
+		<property name="dao" ref="taxStatisticDao" />
+	</bean>
+	<bean id="reportAction" class="com.zrsf.manage.action.ReportAction" scope="prototype">
+		<property name="service" ref="taxStatisticService" />
+	</bean>
+	
+	<bean id="taxIncomeService" class="com.zrsf.manage.service.TaxIncomeService">
+		<property name="dao" ref="taxStatisticDao" />
+	</bean>
+	<bean id="taxIncomeAction" class="com.zrsf.manage.action.TaxIncomeAction" scope="prototype">
+		<property name="service" ref="taxIncomeService" />
+	</bean>
+	
+	<bean id="systemPushDao" class="com.zrsf.manage.dao.SystemPushDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="systemPushService" class="com.zrsf.manage.service.SystemPushService">
+		<property name="dao" ref="systemPushDao" />
+	</bean>
+	<bean id="systemPushAction" class="com.zrsf.manage.action.SystemPushAction" scope="prototype">
+		<property name="service" ref="systemPushService" />
+		<property name="txlservice" ref="systemtxlService" />
+		<property name="sxservice" ref="shuixinService"/>		
+	</bean>
+	<bean id="systemtxlDao" class="com.zrsf.manage.dao.TxlDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="systemtxlService" class="com.zrsf.manage.service.TxlService">
+		<property name="dao" ref="systemtxlDao"></property>
+	</bean>
+	<bean id="txDao" class="com.zrsf.manage.dao.TxDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="txService" class="com.zrsf.manage.service.TxService">
+		<property name="dao" ref="txDao" />
+	</bean>
+	<bean id="txAction" class="com.zrsf.manage.action.TxAction" scope="prototype">
+		<property name="service" ref="txService" />
+		<property name="txlservice" ref="systemtxlService" />
+	</bean>
+	<bean id="tsglDao" class="com.zrsf.manage.dao.tsglDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="tsglservice" class="com.zrsf.manage.service.tsglService">
+		<property name="dao" ref="tsglDao" />
+	</bean>
+	<bean id="tsglAction" class="com.zrsf.manage.action.tsglAction" scope="prototype">
+		<property name="tsglService" ref="tsglservice"/>
+		<property name="txlService" ref="systemtxlService"/>
+	</bean>
+	<bean id="rywhDao" class="com.zrsf.manage.dao.RywhDao">
+		<property name="sessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	<bean id="rywhService" class="com.zrsf.manage.service.RywhService">
+		<property name="dao" ref="rywhDao" />
+	</bean>
+	<bean id="rywhAction" class="com.zrsf.manage.action.RywhAction" scope="prototype">
+		<property name="txlService" ref="systemtxlService"/>
+		<property name="rywhService" ref="rywhService"/>
+	</bean>
+	
+	<bean id="reportService" class="com.zrsf.manage.service.ReportService">
+		<property name="dao" ref="zgsjGrabServiceDao"/>		
+	</bean>
+	
+	<bean id="zgReportAction" class="com.zrsf.manage.action.ZgUploadAction" scope="prototype">
+		<property name="service" ref="reportService"/>		
+	</bean>
+	
+</beans>

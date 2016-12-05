@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.map.dbrw">
+	<cache />
+
+	<resultMap type="TodoTask" id="dbrwMap">
+		<id  property="id" column="RWXH" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="swryDm" column="CLRDM" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="rwly" column="RWLY" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="rwzt" column="RWZT" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="cjsj" column="CJSJ" javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="xbsj" column="XBRQ" javaType="string" jdbcType="VARCHAR"/>   	    	        
+	</resultMap>
+
+<!-- 查询某个税务人员的待办任务-->
+	<select id="selectDbrw" resultMap="dbrwMap"
+		parameterType="java.lang.String">
+  	<![CDATA[
+	SELECT B.RWXH,B.CLRDM,B.RWLY,B.RWZT,B.CJSJ,B.XBRQ
+	FROM
+    	(SELECT A.RWXH,A.CLRDM,A.RWLY,A.RWZT,A.CJSJ,A.XBRQ,ROWNUM RN
+    	 FROM  
+    	 	(
+    	 	SELECT 
+  				RW.RWSL_XH  RWXH,
+  				RW.JSR_DM CLRDM,
+  				(DECODE(RW.CJR_DM,'00000000000','任务配送中心', (SELECT nvl(MC,RW.CJR_DM) FROM DB_ZGXT.T_DM_GY_SWRY M WHERE M.SWRY_DM=RW.CJR_DM))) RWLY,
+  				RW.RW_ZT RWZT,
+  				TO_CHAR(RW.JS_SJ,'yyyy-mm-dd hh24:mi:ss') CJSJ,
+  				TO_CHAR(RW.RWJZ_SJ,'yyyy-mm-dd') XBRQ
+			FROM DB_ZGXT.RW_RWSL RW 
+			WHERE RW.RWZT_DM='04' AND RW.JSR_DM=#{swryDm}
+			ORDER BY RW.JS_SJ DESC    	 	
+            )A
+   ]]>
+		<if test="endNum!=null">
+           <![CDATA[
+    	  WHERE ROWNUM<#{endNum}
+    	  ]]>
+		</if>
+   <![CDATA[
+    	  )B
+	WHERE B.RN>#{startNum}
+	]]>
+	</select>
+		
+	
+		
+	
+	
+	
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	
+	<package name="manage" extends="json-default" namespace="/manage">	
+		<action name="user_*" method="{1}" class="userAction">
+			<result name="success">/WEB-INF/manage/index.jsp</result>
+			<result name="login">/pages/login.jsp</result>	
+			<result name="list">/WEB-INF/manage/yhgl.jsp</result>
+			<result name="add" type="json">				
+				<param name="root">logon</param>								
+			</result>	
+			<result name="tree" type="json">				
+				<param name="root">#request.tree</param>								
+			</result>
+		</action>		
+		<action name="manage_*" method="{1}" class="com.zrsf.manage.action.ManageAction">
+			<result name="success" type="json">				
+				<param name="root">user</param>								
+			</result>
+			<result name="head">/WEB-INF/manage/head.jsp</result>
+			<result name="left">/WEB-INF/manage/left.jsp</result>	
+			<result name="main">/WEB-INF/manage/welcome.html</result>		
+		</action>		
+		<action name="news_*" method="{1}" class="newsAction">
+			<param name="page.pageSize">20</param>
+			<result name="success">/WEB-INF/manage/xxwh.jsp</result>
+			<result name="list">/WEB-INF/manage/newsList.jsp</result>	
+			<result name="delete" type="json">				
+				<param name="root">done</param>	
+			</result>	
+			<result name="status" type="json">				
+				<param name="root">done</param>	
+			</result>
+			<result name="detail">/WEB-INF/manage/newsDetailForm.jsp</result>
+			<result name="modified" type="json">				
+				<param name="root">done</param>	
+			</result> 			
+		</action>																  
+		<action name="SystemPush_*"  method="{1}" class="systemPushAction">
+		    <result name="lxr">/WEB-INF/manage/tzgl.jsp</result>
+		    <result name="success">/WEB-INF/manage/index.html</result>
+		</action>
+		<action name="TxAction_*" method="{1}" class="txAction">
+		    <param name="page.pageSize">20</param>
+		    <result name="alltx">/WEB-INF/manage/txgl.jsp</result>
+		    <result name="txlxr">/WEB-INF/manage/txgl_edit.jsp</result>
+		    <result name="update">/WEB-INF/manage/txgl_edit.jsp</result>
+		    <result name="add" >/WEB-INF/manage/txgl_add.jsp</result>
+		    <result name="delete">/WEB-INF/manage/txgl.jsp</result>
+		    <result name="selectTx">/WEB-INF/manage/txgl.jsp</result>
+		</action>
+		<action name="tsgl_*" method="{1}" class="tsglAction">
+			<result name="success">/WEB-INF/manage/tsgl.jsp</result>
+			<result name="tsdz">/WEB-INF/manage/tsdz.jsp</result>
+			<result name="lmry"  type="json">
+				<param name="root">lmRy</param>
+			</result>
+			<result name="update" type="json">
+				<param name="root">done</param>
+			</result>
+		</action>
+		<action name="rywh_*" method="{1}" class="rywhAction">
+			<result name="txl">/WEB-INF/manage/rrwh.jsp</result>
+			<result name="swry">/WEB-INF/manage/swry.jsp</result>
+			<result name="update" type="json">
+				<param name="root">done</param>
+			</result>
+		</action>		
+		<action name="report_*" method="{1}" class="reportAction">
+			<result name="success" >/WEB-INF/manage/report_upload.jsp</result>
+			<result name="report">/WEB-INF/manage/report_view.jsp</result>					
+		</action>	
+		
+		<action name="zgReport_*" method="{1}" class="zgReportAction">
+			<result name="success" >/WEB-INF/manage/zgbb.jsp</result>			
+			<result name="B04001">/WEB-INF/manage/zgbb_shfx.jsp</result>
+			<result name="B04002">/WEB-INF/manage/zgbb_shbd.jsp</result>
+			<result name="B04003">/WEB-INF/manage/zgbb_zqsbl.jsp</result>	
+			<result name="B04004">/WEB-INF/manage/zgbb_zqrkl.jsp</result>	
+			<result name="B04005">/WEB-INF/manage/zgbb_qszjl.jsp</result>	
+			<result name="B04006">/WEB-INF/manage/zgbb_yqsbcfl.jsp</result>	
+			<result name="B04007">/WEB-INF/manage/zgbb_rwwcl.jsp</result>			
+			<result name="error"  type="json">
+				<param name="contentType">text/html</param>
+				<param name="root">message</param>
+			</result>		
+		</action>	
+		
+		<action name="taxIncome_*" method="{1}" class="taxIncomeAction">
+			<result name="success" >/WEB-INF/manage/gcbb_fssr_upload.jsp</result>								
+		</action>
+	</package>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</struts>    

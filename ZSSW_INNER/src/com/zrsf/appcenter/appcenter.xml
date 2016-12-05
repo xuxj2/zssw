@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.appcenter">
+	<cache />
+	
+	<resultMap id="appMap" type="ApplicationVo" >
+		<id  	property="id" 			column="ID" 		 javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="name" 		column="NAME" 		 javaType="string" jdbcType="VARCHAR"/>  
+   	    <result property="packageName" 	column="PACKAGENAME" javaType="string" jdbcType="VARCHAR"/>  
+   	    <result property="versionCode" 	column="VERSIONCAME" javaType="int" jdbcType="INTEGER"/>  
+   	    <result property="versionName" 	column="VERSIONNAME" javaType="string" jdbcType="VARCHAR"/>  
+   	    <result property="icon" 		column="ICON" 		 javaType="string" jdbcType="VARCHAR"/>  
+   	    <result property="uri" 			column="URL"		 javaType="string" jdbcType="VARCHAR"/>  
+   	    <result property="download" 	column="DOWNLOAD"	 javaType="int" jdbcType="INTEGER"/>  
+   	    <result property="uploadDate" 	column="UPLOADDATE"	 javaType="string" jdbcType="VARCHAR"/>  
+   	    <result property="modifyTime" 	column="MODIFYTIME"	 javaType="string" jdbcType="VARCHAR"/>  
+   	    <result property="description" 	column="DESCRIPTION" javaType="string" jdbcType="VARCHAR"/>
+   	     
+   	    <result property="publisher" 	column="PUBLISHER"	 javaType="string" jdbcType="VARCHAR"/>  
+   	    <result property="appDescription" 	column="APPDESCRIPTION" javaType="string" jdbcType="VARCHAR"/> 
+   	    <result property="image1" 	column="IMAGE1"	 javaType="string" jdbcType="VARCHAR"/> 
+   	    <result property="image2" 	column="IMAGE2"	 javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="image3" 	column="IMAGE3"	 javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="image4" 	column="IMAGE4"	 javaType="string" jdbcType="VARCHAR"/>
+   	    <result property="image5" 	column="IMAGE5"	 javaType="string" jdbcType="VARCHAR"/> 	 
+	</resultMap>
+	
+	<select id="selectAppDetail" parameterType="string" resultMap="appMap">
+	<![CDATA[
+	SELECT ID,
+		   NAME,
+		   PACKAGENAME,
+		   VERSIONCODE,
+		   VERSIONNAME,
+		   ICON,
+		   URL,
+		   DESCRIPTION,
+		   DOWNLOAD,		  
+		   PUBLISHER,
+		   APPDESCRIPTION,
+		   IMAGE1,
+		   IMAGE2,
+		   IMAGE3,
+		   IMAGE4,
+		   IMAGE5
+	FROM APP 
+	WHERE PACKAGENAME=#{packageName}
+	]]>	
+	</select>
+	
+	<select id="selectAllApps"  resultMap="appMap">
+	<![CDATA[
+	SELECT ID,NAME,PACKAGENAME,
+		   VERSIONNAME,PUBLISHER,
+		   ICON,URL,DESCRIPTION 
+	FROM APP 
+	WHERE PACKAGENAME<>'com.cn.szds2.app'
+	]]>	
+	</select>
+	
+	
+	
+</mapper>

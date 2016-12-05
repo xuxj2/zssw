@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>	
+	<setting name="cacheEnabled" value="false"/>
+	
+	<!--  
+	
+	
+		<setting name="mapUnderscoreToCamelCase" value="true"/>		
+ 		<setting name="lazyLoadingEnabled" value="true"/>
+ 		<setting name="multipleResultSetsEnabled" value="true"/>
+ 		<setting name="useColumnLabel" value="true"/>
+ 		<setting name="useGeneratedKeys" value="false"/>
+ 		<setting name="autoMappingBehavior" value="PARTIAL"/>
+ 		<setting name="defaultExecutorType" value="SIMPLE"/>
+ 		<setting name="defaultStatementTimeout" value="25"/> 		
+ 		<setting name="jdbcTypeForNull" value="OTHER"/> 
+ 		<setting name="safeRowBoundsEnabled" value="false"/> 		
+ 		<setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
+ 		<setting name="localCacheScope" value="SESSION"/>
+ 	-->	 
+	</settings>
+	<typeAliases>
+		<typeAlias type="com.zrsf.forclient.vo.Swry" alias="Swry" />
+		<typeAlias type="com.zrsf.push.xmpp.model.NotificationVO" alias="NotificationVO" />		
+		<typeAlias type="com.zrsf.forclient.vo.SwjgTxl" alias="SwjgTxl" />	
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.BankAccount" alias="BankAccount" />	
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.ChangeRecord" alias="ChangeRecord" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.HouseEstate" alias="HouseEstate" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.Investor" alias="Investor" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.LandedEstate" alias="LandedEstate" />				
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.NsrGeneral" alias="NsrGeneral" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.OfficeStaff" alias="OfficeStaff" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.RegisteSource" alias="RegisteSource" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.StatusRecord" alias="StatusRecord" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.JdhdxxVo" alias="JdhdxxVo" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.SbxxVo" alias="SbxxVo" />	
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.RkxxVo" alias="RkxxVo" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.QsxxVo" alias="QsxxVo" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.TsxxVo" alias="TsxxVo" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.FpxxVo" alias="FpxxVo" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.CwxxVo" alias="CwxxVo" />
+		<typeAlias type="com.zrsf.forclient.vo.dhsq.WzxxVo" alias="WzxxVo" />
+		<typeAlias type="com.zrsf.forclient.vo.TodoTask" alias="TodoTask" />		
+		<typeAlias type="com.zrsf.forclient.vo.bbcx.ZqsblVo" alias="ZqsblVo" />
+		<typeAlias type="com.zrsf.forclient.vo.bbcx.ZqrklVo" alias="ZqrklVo" />		
+		<typeAlias type="com.zrsf.forclient.vo.bbcx.QszjlVo" alias="QszjlVo" />
+		<typeAlias type="com.zrsf.forclient.vo.bbcx.YqsbcflVo" alias="YqsbcflVo" />
+		<typeAlias type="com.zrsf.forclient.vo.bbcx.RwzqwclVo" alias="RwzqwclVo" />	
+		<typeAlias type="com.zrsf.forclient.vo.bbcx.DjhsbbVo" alias="DjhsbbVo" />	
+		<typeAlias type="com.zrsf.forclient.vo.bbcx.DjhsbdbbVo" alias="DjhsbdbbVo" />
+		<typeAlias type="com.zrsf.forclient.vo.bbcx.SstjRowVo" alias="SstjRowVo" />
+		
+		<typeAlias type="com.zrsf.backup.vo.NewsSendVo" alias="NewsSendVo" />
+		<typeAlias type="com.zrsf.manage.vo.News" alias="News" />
+		<typeAlias type="com.zrsf.manage.vo.Tiaoxian" alias="Tiaoxian"/>
+		<typeAlias type="com.zrsf.manage.vo.zw" alias="zw"/>
+		<typeAlias type="com.zrsf.manage.vo.rzjg" alias="rzjg"/>
+		<typeAlias type="com.zrsf.manage.vo.SwryVO" alias="swryWh"/>
+		<typeAlias type="com.zrsf.msgpush.ToMessage" alias="ToMessage"/>	
+		<typeAlias type="com.zrsf.appcenter.ApplicationVo" alias="ApplicationVo"/>			
+		<typeAlias type="com.zrsf.manage.vo.txlJsonBean" alias="TxlJsonBean"/>
+		<typeAlias type="com.zrsf.backup.vo.TimerJobVo" alias="TimerJobVo"/>
+		<typeAlias type="com.zrsf.backup.vo.LmdyVo" alias="LmdyVo"/>
+	</typeAliases>
+	
+	<mappers>		 
+		<mapper resource="com/zrsf/map/lmxx.xml" />
+		<mapper resource="com/zrsf/map/txl.xml" />
+		<mapper resource="com/zrsf/map/sx.xml" />
+		<mapper resource="com/zrsf/map/login.xml" />
+		<mapper resource="com/zrsf/map/dhsq.xml" />
+		<mapper resource="com/zrsf/map/dbrw.xml" />		
+		<mapper resource="com/zrsf/map/zgsjrk.xml" />
+		<mapper resource="com/zrsf/map/bbcx.xml" />
+		<mapper resource="com/zrsf/map/timer_job.xml" />
+		<mapper resource="com/zrsf/manage/sqlMap/news.xml" />
+		<mapper resource="com/zrsf/manage/sqlMap/manager.xml"/>
+		<mapper resource="com/zrsf/manage/sqlMap/tax_statistic.xml"/>
+		<mapper resource="com/zrsf/msgpush/push.xml" />	
+		<mapper resource="com/zrsf/appcenter/appcenter.xml" />		
+	</mappers>	
+</configuration> 
+
+ 
+

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zrsf.timer">
+
+<cache />		
+	<resultMap type="TimerJobVo" id="timerJobMap">
+		<id 	property="id" 			column="ID" 		javaType="int" 		jdbcType="INTEGER" />
+		<result property="jobName" 		column="NAME"		javaType="String"	jdbcType="VARCHAR" />
+		<result property="groupName" 	column="GROUPNAME" 	javaType="String"	jdbcType="VARCHAR" />
+		<result property="expression" 	column="EXPRESSION" javaType="String"	jdbcType="VARCHAR" />
+		<result property="task" 		column="TASK" 		javaType="String"	jdbcType="VARCHAR" />
+		<result property="explain" 		column="EXPLAIN" 	javaType="String"	jdbcType="VARCHAR" />
+		<result property="lastTime" 	column="LASTTIME"	javaType="String"	jdbcType="VARCHAR" />
+		<result property="modifiedTime" column="MODIFYTIME"	javaType="String"	jdbcType="VARCHAR" />
+		<result property="effect" 		column="EFFECT" 	javaType="int" 		jdbcType="INTEGER" />	
+	</resultMap>
+
+	<select id="selectJobById" parameterType="int" resultMap="timerJobMap">
+ 		<![CDATA[ 			
+ 		SELECT ID,NAME,GROUPNAME,EXPRESSION,TASK,EXPLAIN,LASTTIME,MODIFYTIME,EFFECT  
+ 		FROM SYS_AUTOMATE 
+ 		WHERE ID=#{id,jdbcType=INTEGER}	
+ 		]]>
+ 	</select>
+ 	<select id="selectByName" parameterType="map" resultMap="timerJobMap">
+ 		<![CDATA[
+ 		SELECT ID,NAME,GROUPNAME,EXPRESSION,TASK,EXPLAIN,LASTTIME,MODIFYTIME,EFFECT  
+ 		FROM SYS_AUTOMATE 
+ 		WHERE NAME=#{jobName,jdbcType=VARCHAR}	
+ 		AND GROUPNAME=#{groupName,jdbcType=VARCHAR}	
+ 		]]>
+ 	</select>
+ 	<select id="selectAll" resultMap="timerJobMap">
+ 		<![CDATA[
+ 		SELECT ID,NAME,GROUPNAME,EXPRESSION,TASK,EXPLAIN,LASTTIME,MODIFYTIME,EFFECT  
+ 		FROM SYS_AUTOMATE
+ 		]]>
+ 	</select>
+ 	
+ 	<update id="updateLastTime" parameterType="map">
+ 		<![CDATA[
+ 		UPDATE SYS_AUTOMATE SET LASTTIME=TO_DATE(#{lastTime,jdbcType=VARCHAR},'YYYY-MM-DD HH24:MI:SS') 
+ 		WHERE GROUPNAME=#{groupName,jdbcType=VARCHAR}
+ 		AND NAME=#{jobName,jdbcType=VARCHAR}
+ 		]]>
+ 	</update>
+ 	
+ 	<update id="updateExpression" parameterType="map">
+ 		<![CDATA[
+ 		UPDATE SYS_AUTOMATE SET EXPRESSION=#{expression,jdbcType=VARCHAR},MODIFYTIME=SYSDATE
+ 		WHERE ID=#{id,jdbcType=INTEGER}
+ 		]]>
+ 	</update>
+ 	
+ 	<update id="updateEffect" parameterType="map">
+ 		<![CDATA[
+ 		UPDATE SYS_AUTOMATE SET EFFECT=#{effect,jdbcType=INTEGER},MODIFYTIME=SYSDATE
+ 		WHERE ID=#{id,jdbcType=INTEGER}
+ 		]]>
+ 	</update>
+ 
+</mapper>
